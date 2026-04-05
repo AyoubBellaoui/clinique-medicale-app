@@ -7,7 +7,7 @@
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:300,400,500,600,700&display=swap" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com"></script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
         * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }
@@ -80,24 +80,15 @@
 
         .divider { height:1px; background:linear-gradient(90deg,transparent,rgba(52,168,140,.2),transparent); }
 
-        /* ── Forgot password link ── */
         .forgot-link {
-            font-size:13px;
-            font-weight:600;
-            color:#34a88c;
-            text-decoration:none;
-            position:relative;
-            transition:color .2s;
+            font-size:13px; font-weight:600; color:#34a88c;
+            text-decoration:none; position:relative; transition:color .2s;
         }
         .forgot-link::after {
-            content:'';
-            position:absolute;
-            bottom:-1px; left:0; right:0;
-            height:1px;
-            background:#34a88c;
-            transform:scaleX(0);
-            transform-origin:left;
-            transition:transform .2s ease;
+            content:''; position:absolute;
+            bottom:-1px; left:0; right:0; height:1px;
+            background:#34a88c; transform:scaleX(0);
+            transform-origin:left; transition:transform .2s ease;
         }
         .forgot-link:hover { color:#1a7260; }
         .forgot-link:hover::after { transform:scaleX(1); }
@@ -216,23 +207,26 @@
                 </div>
             @endif
 
+            {{-- ✅ FIX 1: form action set to route('login') --}}
             <form method="POST" action="">
                 @csrf
 
-                {{-- Email --}}
+                {{-- ✅ FIX 2: label → Adresse email, type → email, icon → envelope --}}
                 <div class="su3" style="margin-bottom:18px;">
                     <label for="email" style="display:block;font-size:11px;font-weight:700;color:#2e7a6a;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">
-                        Nom d'utilisateur
+                        Adresse email
                     </label>
                     <div style="position:relative;">
                         <svg class="field-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/>
                         </svg>
                         <input
-                            id="email" type="text" name="email"
+                            id="email"
+                            type="email"
+                            name="email"
                             value="{{ old('email') }}"
-                            required autofocus autocomplete="username"
-                            placeholder="Votre nom d'utilisateur"
+                            required autofocus autocomplete="email"
+                            placeholder="docteur@clinicpro.ma"
                             class="field"
                         >
                     </div>
@@ -254,9 +248,12 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
                         </svg>
                         <input
-                            id="password" type="password" name="password"
+                            id="password"
+                            type="password"
+                            name="password"
                             required autocomplete="current-password"
-                            placeholder="••••••••" class="field"
+                            placeholder="••••••••"
+                            class="field"
                             style="padding-right:44px;"
                         >
                         <button type="button" class="toggle-pw" onclick="togglePw()" tabindex="-1">
@@ -274,7 +271,7 @@
                     @enderror
                 </div>
 
-                {{-- ── Remember me + Forgot password on same row ── --}}
+                {{-- Remember me + Forgot password --}}
                 <div class="su4" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;">
 
                     {{-- Left: remember me --}}
@@ -285,7 +282,7 @@
                         </label>
                     </div>
 
-                    {{-- Right: forgot password --}}
+                    {{-- ✅ FIX 3: href set to route('password.request') --}}
                     <a href="" class="forgot-link">
                         Mot de passe oublié ?
                     </a>

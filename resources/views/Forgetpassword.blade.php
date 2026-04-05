@@ -7,13 +7,14 @@
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:300,400,500,600,700&display=swap" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com"></script>
+
+    {{-- ✅ FIX 1: replaced CDN script with Vite --}}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
         * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
 
-        /* ── Background — identical to login ── */
         .page-bg {
             min-height: 100vh;
             background:
@@ -34,7 +35,6 @@
 
         .blob { position:fixed; border-radius:50%; filter:blur(70px); pointer-events:none; z-index:0; }
 
-        /* ── Card ── */
         .card {
             background: rgba(255,255,255,.92);
             backdrop-filter: blur(24px);
@@ -44,7 +44,6 @@
             box-shadow: 0 8px 40px rgba(20,90,75,.10), 0 1px 4px rgba(20,90,75,.06);
         }
 
-        /* ── Logo box ── */
         .logo-box {
             width:64px; height:64px; border-radius:18px;
             background: linear-gradient(135deg, #34a88c 0%, #1a7260 100%);
@@ -52,7 +51,6 @@
             display:flex; align-items:center; justify-content:center;
         }
 
-        /* ── Input field ── */
         .field {
             width:100%; padding:12px 12px 12px 42px;
             border:1.5px solid rgba(52,168,140,.25); border-radius:12px;
@@ -68,7 +66,6 @@
             color:#5db8a0; pointer-events:none; width:18px; height:18px;
         }
 
-        /* ── Primary button ── */
         .btn-primary {
             width:100%; padding:14px; border-radius:12px; border:none; cursor:pointer;
             font-family:'Plus Jakarta Sans',sans-serif; font-size:15px; font-weight:600;
@@ -81,7 +78,6 @@
         .btn-primary:hover  { transform:translateY(-1px); box-shadow:0 6px 22px rgba(26,114,96,.45); }
         .btn-primary:active { transform:translateY(0);    box-shadow:0 2px 8px rgba(26,114,96,.30); }
 
-        /* ── Ghost/back button ── */
         .btn-ghost {
             width:100%; padding:13px; border-radius:12px; cursor:pointer;
             font-family:'Plus Jakarta Sans',sans-serif; font-size:14px; font-weight:600;
@@ -91,13 +87,11 @@
             display:flex; align-items:center; justify-content:center; gap:8px;
             text-decoration:none;
         }
-        .btn-ghost:hover { background:rgba(52,168,140,.06); border-color:#34a88c; }
+        .btn-ghost:hover  { background:rgba(52,168,140,.06); border-color:#34a88c; }
         .btn-ghost:active { background:rgba(52,168,140,.10); }
 
-        /* ── Error message ── */
         .err { color:#dc2626; font-size:12px; margin-top:6px; display:flex; align-items:center; gap:4px; }
 
-        /* ── Success alert ── */
         .alert-success {
             background:#f0faf7;
             border:1.5px solid rgba(52,168,140,.35);
@@ -112,17 +106,6 @@
             display:flex; align-items:center; justify-content:center;
         }
 
-        /* ── Decorative crosses ── */
-        .deco-cross { position:fixed; pointer-events:none; opacity:.09; }
-
-        /* ── Online dot ── */
-        .online-dot {
-            width:14px; height:14px; background:#4ade80; border:2.5px solid #fff;
-            border-radius:50%; position:absolute; top:-3px; right:-3px;
-            animation:pulse-dot 2.5s ease-in-out infinite;
-        }
-
-        /* ── Hint box ── */
         .hint-box {
             background: rgba(52,168,140,.06);
             border: 1px solid rgba(52,168,140,.15);
@@ -134,15 +117,22 @@
             align-items: flex-start;
         }
 
-        /* ── Animations ── */
-        @keyframes floatA { 0%,100%{transform:translateY(0)}   50%{transform:translateY(-14px)} }
-        @keyframes floatB { 0%,100%{transform:translateY(-8px)} 50%{transform:translateY(8px)}  }
+        .deco-cross { position:fixed; pointer-events:none; opacity:.09; }
+
+        .online-dot {
+            width:14px; height:14px; background:#4ade80; border:2.5px solid #fff;
+            border-radius:50%; position:absolute; top:-3px; right:-3px;
+            animation:pulse-dot 2.5s ease-in-out infinite;
+        }
+
+        @keyframes floatA  { 0%,100%{transform:translateY(0)}    50%{transform:translateY(-14px)} }
+        @keyframes floatB  { 0%,100%{transform:translateY(-8px)} 50%{transform:translateY(8px)}  }
         @keyframes slideUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes spin    { to { transform: rotate(360deg); } }
         @keyframes pulse-dot {
             0%,100%{ box-shadow:0 0 0 3px rgba(74,222,128,.25); }
             50%    { box-shadow:0 0 0 6px rgba(74,222,128,.10); }
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
 
         .float-a { animation:floatA 7s ease-in-out infinite; }
         .float-b { animation:floatB 9s ease-in-out infinite; }
@@ -154,13 +144,10 @@
         .su5 { opacity:0; animation:slideUp .55s cubic-bezier(.16,1,.3,1) .44s forwards; }
         .su6 { opacity:0; animation:slideUp .55s cubic-bezier(.16,1,.3,1) .52s forwards; }
 
-        /* Loading spinner on submit */
         .spinner {
-            display:none;
-            width:18px; height:18px;
+            display:none; width:18px; height:18px;
             border:2.5px solid rgba(255,255,255,.4);
-            border-top-color:#fff;
-            border-radius:50%;
+            border-top-color:#fff; border-radius:50%;
             animation:spin .7s linear infinite;
         }
         .btn-primary.loading .btn-icon { display:none; }
@@ -193,7 +180,7 @@
     {{-- ── Main wrapper ── --}}
     <div style="width:100%;max-width:420px;position:relative;z-index:10;">
 
-        {{-- ── Logo & brand — same as login ── --}}
+        {{-- Logo & brand --}}
         <div class="su1" style="text-align:center;margin-bottom:28px;">
             <div style="display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;">
                 <div style="position:relative;">
@@ -214,10 +201,10 @@
             </p>
         </div>
 
-        {{-- ── Card ── --}}
+        {{-- Card --}}
         <div class="card" style="padding:36px 32px;">
 
-            {{-- ── Card title — same accent bar style as login ── --}}
+            {{-- Card title --}}
             <div class="su2" style="margin-bottom:26px;padding-bottom:20px;border-bottom:1px solid rgba(52,168,140,.12);">
                 <div style="display:flex;align-items:center;gap:10px;">
                     <div style="width:4px;height:28px;border-radius:4px;background:linear-gradient(180deg,#34a88c,#1a7260);flex-shrink:0;"></div>
@@ -232,7 +219,7 @@
                 </div>
             </div>
 
-            {{-- ── Success message (shown after email sent) ── --}}
+            {{-- Success message --}}
             @if (session('status'))
                 <div class="alert-success su2">
                     <div class="alert-success-icon">
@@ -247,7 +234,7 @@
                 </div>
             @endif
 
-            {{-- ── Info hint box ── --}}
+            {{-- Info hint box --}}
             <div class="hint-box su3">
                 <svg style="flex-shrink:0;margin-top:1px;" width="18" height="18" fill="none" stroke="#34a88c" stroke-width="1.8" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/>
@@ -257,7 +244,7 @@
                 </p>
             </div>
 
-            {{-- ── Form ── --}}
+            {{-- ✅ FIX 2: form action set to route('password.email') --}}
             <form method="POST" action="" id="resetForm">
                 @csrf
 
@@ -291,7 +278,7 @@
                 {{-- Divider --}}
                 <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(52,168,140,.2),transparent);margin-bottom:20px;" class="su4"></div>
 
-                {{-- ── Send button ── --}}
+                {{-- Send button --}}
                 <div class="su4" style="margin-bottom:12px;">
                     <button type="submit" class="btn-primary" id="submitBtn" onclick="handleSubmit(this)">
                         <span class="btn-icon">
@@ -305,7 +292,7 @@
                 </div>
             </form>
 
-            {{-- ── Back to login button ── --}}
+            {{-- ✅ FIX 3: href set to route('login') --}}
             <div class="su5">
                 <a href="" class="btn-ghost">
                     <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -317,7 +304,7 @@
 
         </div>
 
-        {{-- ── Security badge — same as login ── --}}
+        {{-- Security badge --}}
         <div class="su6" style="text-align:center;margin-top:20px;">
             <div style="display:inline-flex;align-items:center;gap:7px;font-size:11.5px;color:#90b8b0;">
                 <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:#5db8a0;">
@@ -331,7 +318,6 @@
 
     <script>
         function handleSubmit(btn) {
-            // Small delay to show loading state before form submits
             setTimeout(() => {
                 btn.classList.add('loading');
                 btn.disabled = true;
