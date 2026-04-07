@@ -282,8 +282,8 @@
                         </label>
                     </div>
 
-                    {{-- ✅ FIX 3: href set to route('password.request') --}}
-                    <a href="" class="forgot-link">
+                    {{-- PasswordForget --}}
+                    <a href="{{ route('ForgetPassword') }}" class="forgot-link">
                         Mot de passe oublié ?
                     </a>
 
