@@ -2,13 +2,16 @@
 
 use Illuminate\Support\Facades\Route;
 
+
 Route::get('/', function () {
-    return view('Login');
+    return view('auth.Login');
 })->name('Login');
 
-Route::get('/Forgetpassword', function () {
-    return view('/Forgetpassword');
+Route::get('/forgetpassword', function () {
+    return view('auth.Forgetpassword');
 })->name('ForgetPassword');
 
 
-
+Route::get('/dashboard', function () {
+    return view('dashboard.index');
+})->name('Dashboard');

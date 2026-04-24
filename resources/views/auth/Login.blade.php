@@ -11,7 +11,7 @@
 
     <style>
         * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; } 
 
         .page-bg {
             min-height: 100vh;
