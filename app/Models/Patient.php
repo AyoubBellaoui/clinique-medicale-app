@@ -29,7 +29,6 @@ class Patient extends Model
         'cin',
         'telephone',
         'adresse',
-
         'email',
         'groupe_sanguin',
         'allergies',
@@ -42,6 +41,11 @@ class Patient extends Model
         'contact_urgence_tel',
         'lien_urgence',
     ];
+
+    public function medecin()
+    {
+        return $this->belongsTo(Staff::class, 'medecin_id', 'id');
+    }
 
     public function fileAttentes()
     {

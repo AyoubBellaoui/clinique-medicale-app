@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Patient;
 use Illuminate\Http\Request;
 
 class PatientsController extends Controller
@@ -11,7 +12,8 @@ class PatientsController extends Controller
      */
     public function index()
     {
-        return view('patients.index');
+        $patients = Patient::all();
+        return view('patients.index', compact('patients'));
     }
 
     /**
@@ -27,7 +29,7 @@ class PatientsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
     }
 
     /**

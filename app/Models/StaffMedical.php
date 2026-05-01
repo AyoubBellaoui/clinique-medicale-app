@@ -60,6 +60,11 @@ class StaffMedical extends Model
         'role',
     ];
 
+    public function patients()
+    {
+        return $this->hasMany(Patient::class, 'medecin_id', 'id');
+    }
+
     public function fileAttentes()
     {
         return $this->hasMany(FileAttente::class, 'id_staff', 'id_staff');
