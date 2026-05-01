@@ -29,6 +29,18 @@ class Patient extends Model
         'cin',
         'telephone',
         'adresse',
+
+        'email',
+        'groupe_sanguin',
+        'allergies',
+        'antecedents',
+        'medecin_id',
+        'statut_dossier',
+        'assurance_type',
+        'assurance_numero',
+        'contact_urgence_nom',
+        'contact_urgence_tel',
+        'lien_urgence',
     ];
 
     public function fileAttentes()

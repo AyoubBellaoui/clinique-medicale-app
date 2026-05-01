@@ -20,11 +20,11 @@ return new class extends Migration {
         $table->string('adresse')->nullable();
 
         $table->timestamps();
-    });
+        });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('PATIENT');
+        Schema::dropIfExists('patients');
     }
 };
