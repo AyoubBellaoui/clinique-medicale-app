@@ -12,10 +12,10 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Consultation query()
  * @mixin \Eloquent
  */
+
 class Consultation extends Model
 {
-    protected $table      = 'consultations';
-    protected $primaryKey = 'id_consultation';
+    protected $table = 'consultations';
 
     protected $fillable = [
         'date_consultation',
@@ -24,17 +24,17 @@ class Consultation extends Model
         'ordonnance_path',
         'scanner_path',
         'analyse_path',
-        'id_patient',
-        'id_staff',
+        'patient_id',
+        'staff_id',
     ];
 
     public function patient()
     {
-        return $this->belongsTo(Patient::class, 'id_patient', 'id_patient');
+        return $this->belongsTo(Patient::class, 'patient_id', 'id');
     }
 
     public function staff()
     {
-        return $this->belongsTo(StaffMedical::class, 'id_staff', 'id_staff');
+        return $this->belongsTo(StaffMedical::class, 'staff_id', 'id');
     }
 }

@@ -26,16 +26,16 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|FileAttente whereUpdatedAt($value)
  * @mixin \Eloquent
  */
+
 class FileAttente extends Model
 {
-    protected $table      = 'file_attentes';
-    protected $primaryKey = 'id_file';
+    protected $table = 'file_attentes';
 
     protected $fillable = [
         'date',
         'statut',
-        'id_patient',
-        'id_staff',
+        'patient_id',
+        'staff_id',
     ];
 
     protected $casts = [
@@ -44,11 +44,11 @@ class FileAttente extends Model
 
     public function patient()
     {
-        return $this->belongsTo(Patient::class, 'id_patient', 'id_patient');
+        return $this->belongsTo(Patient::class, 'patient_id', 'id');
     }
 
     public function staff()
     {
-        return $this->belongsTo(StaffMedical::class, 'id_staff', 'id_staff');
+        return $this->belongsTo(StaffMedical::class, 'staff_id', 'id');
     }
 }

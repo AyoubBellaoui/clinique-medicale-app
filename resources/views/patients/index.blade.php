@@ -30,7 +30,7 @@
             <button class="btn btn-outline btn-sm">Exporter</button>
 
             <a href="{{ route('patients.create') }}" class="btn btn-primary btn-sm">
-                Nouveau Patient
+                ➕ Nouveau Patient
             </a>
         </div>
     </div>

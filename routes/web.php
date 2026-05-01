@@ -23,43 +23,12 @@ Route::middleware('auth')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'show_dashboard'])->name('dashboard.show');
 
-    // Appointments
-    Route::get('/appointments',        fn() => view('appointments.index'))->name('appointments.index');
-    Route::get('/appointments/create', fn() => view('appointments.create'))->name('appointments.create');
-    Route::post('/appointments',       fn() => redirect('/appointments'))->name('appointments.store');
-
     // Patients
-    Route::get('/patients', [PatientsController::class, 'index'])->name('patients.index');
-    Route::get('/patients/create', [PatientsController::class, 'create'])->name('patients.create');
-    
-    // Staff
-    Route::get('/staff',        fn() => view('staff.index'))->name('staff.index');
-    Route::get('/staff/create', fn() => view('staff.create'))->name('staff.create');
-    Route::post('/staff',       fn() => redirect('/staff'))->name('staff.store');
+    Route::get('/patients', [PatientController::class, 'index'])->name('patients.index');
+    Route::get('/patients/create', [PatientController::class, 'create'])->name('patients.create');
 
-    // Queue
-    Route::get('/queue',        fn() => view('queue.index'))->name('queue.index');
-    Route::get('/queue/create', fn() => view('queue.create'))->name('queue.create');
-    Route::post('/queue',       fn() => redirect('/queue'))->name('queue.store');
+    // Staff Medical
+    Route::get('/staff', [StaffMedicalController::class, 'index'])->name('staff.index');
+    Route::get('/staff/create', [StaffMedicalController::class, 'create'])->name('staff.create');
 
-    // Consultations
-    Route::get('/consultations',        fn() => view('consultations.index'))->name('consultations.index');
-    Route::get('/consultations/create', fn() => view('consultations.create'))->name('consultations.create');
-    Route::post('/consultations',       fn() => redirect('/consultations'))->name('consultations.store');
-
-    // Prescriptions
-    Route::get('/prescriptions',        fn() => view('prescriptions.index'))->name('prescriptions.index');
-    Route::get('/prescriptions/create', fn() => view('prescriptions.create'))->name('prescriptions.create');
-    Route::post('/prescriptions',       fn() => redirect('/prescriptions'))->name('prescriptions.store');
-
-    // Billing
-    Route::get('/billing',        fn() => view('billing.index'))->name('billing.index');
-    Route::get('/billing/create', fn() => view('billing.create'))->name('billing.create');
-    Route::post('/billing',       fn() => redirect('/billing'))->name('billing.store');
-
-    // Account
-    Route::get('/account', fn() => view('account.index'))->name('account.index');
-
-    // Logout
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

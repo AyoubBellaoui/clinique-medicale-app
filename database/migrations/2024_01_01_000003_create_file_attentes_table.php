@@ -10,10 +10,18 @@ return new class extends Migration {
         Schema::create('file_attentes', function (Blueprint $table) {
             $table->id();
 
-            $table->dateTime('date')->useCurrent();
-            $table->enum('statut', ['en_attente', 'en_cours', 'termine', 'annule'])
-                ->default('en_attente');
+            // Arrival time in waiting queue
+            $table->dateTime('arrived_at')->useCurrent();
 
+            // Queue status
+            $table->enum('statut', [
+                'en_attente',
+                'en_cours',
+                'termine',
+                'annule'
+            ])->default('en_attente');
+
+            // Relations
             $table->foreignId('patient_id')
                 ->constrained('patients')
                 ->cascadeOnDelete();
@@ -28,6 +36,6 @@ return new class extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('FILE_ATTENTE');
+        Schema::dropIfExists('file_attentes');
     }
 };

@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Patient;
+use App\Models\StaffMedical;
 use Illuminate\Http\Request;
 
-class PatientsController extends Controller
+class StaffMedicalController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $patients = Patient::all();
-        return view('patients.index', compact('patients'));
+        $staff = StaffMedical::all();
+
+        return view('staff.index', compact('staff'));
     }
 
     /**
@@ -21,7 +22,7 @@ class PatientsController extends Controller
      */
     public function create()
     {
-        return view('patients.create');
+        return view('staff.create');
     }
 
     /**
@@ -29,7 +30,7 @@ class PatientsController extends Controller
      */
     public function store(Request $request)
     {
-        
+        //
     }
 
     /**

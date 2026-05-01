@@ -10,14 +10,17 @@ return new class extends Migration {
         Schema::create('consultations', function (Blueprint $table) {
             $table->id();
 
-            $table->date('date_consultation')->nullable();
+            // Consultation date & time
+            $table->dateTime('date_consultation')->useCurrent();
 
-            $table->string('diagnostic_path', 500)->nullable();
-            $table->string('traitement_path', 500)->nullable();
-            $table->string('ordonnance_path', 500)->nullable();
-            $table->string('scanner_path', 500)->nullable();
-            $table->string('analyse_path', 500)->nullable();
+            // Medical files
+            $table->string('diagnostic_file', 500)->nullable();
+            $table->string('traitement_file', 500)->nullable();
+            $table->string('ordonnance_file', 500)->nullable();
+            $table->string('scanner_file', 500)->nullable();
+            $table->string('analyse_file', 500)->nullable();
 
+            // Relations
             $table->foreignId('patient_id')
                 ->constrained('patients')
                 ->cascadeOnDelete();
@@ -32,6 +35,6 @@ return new class extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('CONSULTATION');
+        Schema::dropIfExists('consultations');
     }
 };

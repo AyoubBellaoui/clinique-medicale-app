@@ -8,18 +8,26 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('patients', function (Blueprint $table) {
-        $table->id();
+            $table->id();
 
-        $table->string('nom');
-        $table->string('prenom');
-        $table->date('date_naissance');
-        $table->string('genre');
-        $table->string('statut_marital');
-        $table->string('cin')->unique();
-        $table->string('telephone');
-        $table->string('adresse')->nullable();
+            $table->string('nom');
+            $table->string('prenom');
+            $table->date('date_naissance');
 
-        $table->timestamps();
+            // Better control
+            $table->enum('genre', ['M', 'F']);
+            $table->enum('statut_marital', [
+                'celibataire',
+                'marie',
+                'divorce',
+                'veuf'
+            ]);
+
+            $table->string('cin')->unique();
+            $table->string('telephone');
+            $table->string('adresse')->nullable();
+
+            $table->timestamps();
         });
     }
 

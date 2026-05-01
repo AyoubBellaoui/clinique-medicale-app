@@ -15,10 +15,10 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Patient query()
  * @mixin \Eloquent
  */
+
 class Patient extends Model
 {
-    protected $table      = 'patients';
-    protected $primaryKey = 'id_patient';
+    protected $table = 'patients';
 
     protected $fillable = [
         'nom',
@@ -44,17 +44,17 @@ class Patient extends Model
 
     public function medecin()
     {
-        return $this->belongsTo(Staff::class, 'medecin_id', 'id');
+        return $this->belongsTo(StaffMedical::class, 'medecin_id', 'id');
     }
 
     public function fileAttentes()
     {
-        return $this->hasMany(FileAttente::class, 'id_patient', 'id_patient');
+        return $this->hasMany(FileAttente::class, 'id_patient', 'id');
     }
 
     public function consultations()
     {
-        return $this->hasMany(Consultation::class, 'id_patient', 'id_patient');
+        return $this->hasMany(Consultation::class, 'id_patient', 'id');
     }
 
     public function getFullNameAttribute(): string
