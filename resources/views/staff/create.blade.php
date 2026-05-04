@@ -552,7 +552,6 @@ const completedSections = new Set();
 /* ── On page load: restore state from Laravel old() ── */
 window.addEventListener('DOMContentLoaded', () => {
 
-    // Mark previous sections as done if validation failed on section 2 or 3
     @if($openSection > 1)
         @for($i = 1; $i < $openSection; $i++)
             completedSections.add({{ $i }});
@@ -560,21 +559,17 @@ window.addEventListener('DOMContentLoaded', () => {
     @endif
     updateSteps();
 
-    // Restore preview text fields
     updatePreview();
 
-    // Restore gender button
     const oldGender = "{{ old('gender') }}";
     if (oldGender) selectGender(oldGender);
 
-    // Restore role button
     const oldRole = "{{ old('role') }}";
     if (oldRole) {
         const roleBtn = document.querySelector(`.role-btn[data-role="${oldRole}"]`);
         if (roleBtn) selectRole(oldRole, roleBtn.dataset.color, roleBtn.textContent.trim());
     }
 
-    // Restore languages
     const oldLangsRaw = "{{ old('languages', '') }}";
     const oldLangs = oldLangsRaw.split(',').filter(Boolean);
     oldLangs.forEach(l => {
@@ -586,19 +581,15 @@ window.addEventListener('DOMContentLoaded', () => {
     });
     document.getElementById('lang_input').value = [...selectedLangs].join(',');
 
-    // Restore contract button
     const oldContract = "{{ old('contract_type') }}";
     if (oldContract) selectContract(oldContract);
 
-    // Restore schedule button
     const oldSchedule = "{{ old('schedule') }}";
     if (oldSchedule) selectSchedule(oldSchedule);
 
-    // Restore status button (default: actif)
     const oldStatus = "{{ old('status', 'actif') }}";
     selectStatus(oldStatus);
 
-    // Restore hire date preview
     const oldHire = "{{ old('date_embauche') }}";
     if (oldHire) {
         const d = new Date(oldHire);
@@ -606,10 +597,8 @@ window.addEventListener('DOMContentLoaded', () => {
             'Depuis ' + d.toLocaleDateString('fr-FR', {day:'2-digit', month:'short', year:'numeric'});
     }
 
-    // Restore contract preview
     if (oldContract) document.getElementById('preview-contract').textContent = oldContract;
 
-    // Restore avatar color
     const oldColor = "{{ old('color', 'teal') }}";
     const colorHexMap = { teal:'#2e9278', blue:'#3b82f6', amber:'#f59e0b', rose:'#f43f5e', violet:'#7c3aed' };
     if (oldColor && colorHexMap[oldColor]) {
@@ -710,6 +699,7 @@ const roleBanners = {
     technicien: 'linear-gradient(135deg,#059669,#10b981)',
     secretaire: 'linear-gradient(135deg,#ec4899,#f472b6)',
 };
+
 function selectRole(val, color, label) {
     document.getElementById('role_input').value = val;
     document.querySelectorAll('.role-btn').forEach(b => {
@@ -725,16 +715,28 @@ function selectRole(val, color, label) {
     const wrap  = document.getElementById('preview-role-badge-wrap');
     const badge = document.getElementById('preview-role-badge');
     if (wrap && badge) { badge.textContent = label; wrap.style.display = 'block'; }
+
+    // ── FIX : pas de disabled, juste pointer-events + opacité ──
     const specWrap   = document.getElementById('specialty-wrap');
     const specSelect = document.getElementById('specialty_field');
     const allowSpec  = (val === 'medecin' || val === 'infirmier');
     if (specWrap && specSelect) {
-        specWrap.style.opacity = allowSpec ? '1' : '0.4';
-        specSelect.disabled    = !allowSpec;
-        if (!allowSpec) specSelect.selectedIndex = 0;
+        specWrap.style.opacity       = allowSpec ? '1'    : '0.45';
+        specWrap.style.pointerEvents = allowSpec ? ''     : 'none';
+        // On vide la valeur si rôle non concerné (évite d'envoyer une spécialité parasite)
+        if (!allowSpec) {
+            specSelect.selectedIndex = 0;
+            const previewSpec = document.getElementById('preview-specialty');
+            if (previewSpec) previewSpec.textContent = label;
+        }
     }
+
     const previewSpec = document.getElementById('preview-specialty');
-    if (previewSpec) previewSpec.textContent = allowSpec && specSelect?.value ? specSelect.options[specSelect.selectedIndex].text : label;
+    if (previewSpec && allowSpec && specSelect?.value) {
+        previewSpec.textContent = specSelect.options[specSelect.selectedIndex].text;
+    } else if (previewSpec && !allowSpec) {
+        previewSpec.textContent = label;
+    }
 }
 
 /* ── Contract ── */
@@ -786,6 +788,7 @@ function selectStatus(s) {
 const colorGrads   = { teal:'linear-gradient(135deg,#34a88c,#2e9278)', blue:'linear-gradient(135deg,#60a5fa,#3b82f6)', amber:'linear-gradient(135deg,#fbbf24,#f59e0b)', rose:'linear-gradient(135deg,#fb7185,#f43f5e)', violet:'linear-gradient(135deg,#a78bfa,#7c3aed)' };
 const colorBanners = { teal:'linear-gradient(135deg,var(--teal-700),var(--teal-500))', blue:'linear-gradient(135deg,#2563eb,#3b82f6)', amber:'linear-gradient(135deg,#d97706,#f59e0b)', rose:'linear-gradient(135deg,#e11d48,#f43f5e)', violet:'linear-gradient(135deg,#5b21b6,#7c3aed)' };
 const colorHex     = { teal:'#2e9278', blue:'#3b82f6', amber:'#f59e0b', rose:'#f43f5e', violet:'#7c3aed' };
+
 function updatePreviewColor(cname, chex) {
     const avatar = document.getElementById('preview-avatar');
     if (avatar) { avatar.style.background = colorGrads[cname] || chex; avatar.style.boxShadow = '0 4px 14px ' + chex + '55'; }

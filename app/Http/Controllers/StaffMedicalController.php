@@ -44,8 +44,9 @@ class StaffMedicalController extends Controller
             'color'          => 'required|in:teal,blue,amber,rose,violet',
 
             // Section 2
-            'role'           => 'required|in:medecin,infirmier,secretaire,admin,technicien',
-            'specialite'     => 'required|string|max:100',
+            // Section 2
+'role'           => 'required|in:medecin,infirmier,secretaire,admin,technicien',
+'specialite'     => 'required_if:role,medecin,infirmier|nullable|string|max:100',
             'license_number' => 'required|string|max:50',
             'degree'         => 'required|string|max:100',
             'school'         => 'required|string|max:150',
@@ -103,7 +104,7 @@ class StaffMedicalController extends Controller
             'role.in'       => 'Rôle invalide.',
 
             // specialité
-            'specialite.required' => 'Spécialité obligatoire.',
+            'specialite.required_if' => 'Spécialité obligatoire pour médecin/infirmier.',
             'specialite.max'      => 'Spécialité trop longue.',
 
             // licence
