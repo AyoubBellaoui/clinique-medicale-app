@@ -6,21 +6,6 @@
 
 @section('content')
 
-@php
-$staff = $staff ?? [];
-
-$roleColors = [
-    'Médecin' => 'teal',
-    'Infirmier(e)' => 'blue',
-    'Administratif' => 'amber',
-    'Technicien' => 'violet',
-];
-
-function badgeColor($role, $map) {
-    return $map[$role] ?? 'gray';
-}
-@endphp
-
 {{-- STATS --}}
 <div class="stats-grid">
 
@@ -89,10 +74,10 @@ function badgeColor($role, $map) {
                 <tr>
                     <th>Membre</th>
                     <th>Spécialité</th>
-                    <th>Rôle</th>
                     <th>Téléphone</th>
                     <th>Embauché</th>
                     <th>Salaire</th>
+                    <th>Rôle</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -105,11 +90,21 @@ function badgeColor($role, $map) {
                     <td>
                         <div class="avatar-chip">
                             <div class="avatar {{ $s['color'] }}">
-                                {{ $s['initials'] }}
+                                @php
+                                $nom = trim($s['nom'] ?? '');
+                                $prenom = trim($s['prenom'] ?? '');
+
+                                $initials = strtoupper(
+                                substr($nom, 0, 1) .
+                                substr($prenom, 0, 1)
+                                );
+                                @endphp
+
+                                {{ $initials ?: '?' }}
                             </div>
 
                             <div class="avatar-info">
-                                <p>{{ $s['name'] }}</p>
+                                <p>{{ $s['prenom'] }} {{ $s['nom'] }}</p>
                                 <span>{{ $s['email'] }}</span>
                             </div>
                         </div>
@@ -117,29 +112,42 @@ function badgeColor($role, $map) {
 
                     {{-- SPECIALTY --}}
                     <td>
-                        {{ $s['specialty'] !== '–' ? $s['specialty'] : '—' }}
-                    </td>
-
-                    {{-- ROLE --}}
-                    <td>
-                        <span class="badge badge-{{ badgeColor($s['role'], $roleColors) }}">
-                            {{ $s['role'] }}
-                        </span>
+                        {{ $s['specialite'] !== '–' ? $s['specialite'] : '—' }}
                     </td>
 
                     {{-- PHONE --}}
-                    <td>{{ $s['phone'] }}</td>
+                    <td>{{ $s['telephone'] }}</td>
 
                     {{-- HIRED --}}
                     <td style="color:var(--muted);">
-                        {{ $s['hired'] }}
+                        {{ $s['date_embauche'] }}
                     </td>
 
                     {{-- SALARY --}}
                     <td>
                         <strong style="color:var(--teal-700);">
-                            {{ number_format($s['salary'], 0, ',', ' ') }} MAD
+                            {{ number_format($s['salaire'], 0, ',', ' ') }} MAD
                         </strong>
+                    </td>
+
+                    {{-- ROLE --}}
+                    <td>
+                        @php
+                        $role = trim(mb_strtolower($s['role'] ?? ''));
+
+                        $color = match($role) {
+                        'médecin' => 'teal',
+                        'infirmier(e)' => 'blue',
+                        'administratif' => 'amber',
+                        'technicien' => 'violet',
+                        default => 'gray'
+                        };
+                        @endphp
+
+                        <span class="badge badge-{{ $color }}">
+                            <span class="dot"></span>
+                            {{ $s['role'] }}
+                        </span>
                     </td>
 
                     {{-- ACTIONS --}}
