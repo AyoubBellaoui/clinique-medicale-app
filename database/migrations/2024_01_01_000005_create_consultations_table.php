@@ -10,17 +10,11 @@ return new class extends Migration {
         Schema::create('consultations', function (Blueprint $table) {
             $table->id();
 
-            // Consultation date & time
             $table->dateTime('date_consultation')->useCurrent();
 
-            // Medical files
-            $table->string('diagnostic_file', 500)->nullable();
-            $table->string('traitement_file', 500)->nullable();
-            $table->string('ordonnance_file', 500)->nullable();
-            $table->string('scanner_file', 500)->nullable();
-            $table->string('analyse_file', 500)->nullable();
+            $table->text('diagnostic')->nullable();
+            $table->text('notes')->nullable();
 
-            // Relations
             $table->foreignId('patient_id')
                 ->constrained('patients')
                 ->cascadeOnDelete();

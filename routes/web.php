@@ -30,5 +30,8 @@ Route::middleware('auth')->group(function () {
     // Staff Medical
     Route::get('/staff', [StaffMedicalController::class, 'index'])->name('staff.index');
     Route::get('/staff/create', [StaffMedicalController::class, 'create'])->name('staff.create');
+    Route::post('/staff/store', [StaffMedicalController::class, 'store'])->name('staff.store');
 
+    // logout
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

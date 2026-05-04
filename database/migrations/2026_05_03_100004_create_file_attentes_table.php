@@ -10,10 +10,9 @@ return new class extends Migration {
         Schema::create('file_attentes', function (Blueprint $table) {
             $table->id();
 
-            // Arrival time in waiting queue
             $table->dateTime('arrived_at')->useCurrent();
+            $table->integer('position')->nullable();
 
-            // Queue status
             $table->enum('statut', [
                 'en_attente',
                 'en_cours',
@@ -21,7 +20,12 @@ return new class extends Migration {
                 'annule'
             ])->default('en_attente');
 
-            // Relations
+            // ✅ Link to rendez-vous (corrected)
+            $table->foreignId('rendez_vous_id')
+                ->nullable()
+                ->constrained('rendez_vous')
+                ->nullOnDelete();
+
             $table->foreignId('patient_id')
                 ->constrained('patients')
                 ->cascadeOnDelete();

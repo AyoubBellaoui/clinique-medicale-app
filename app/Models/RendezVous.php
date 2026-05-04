@@ -4,18 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Consultation extends Model
+class RendezVous extends Model
 {
+    protected $table = 'rendez_vous';
+
     protected $fillable = [
-        'date_consultation',
-        'diagnostic',
-        'notes',
+        'date',
+        'heure',
+        'statut',
         'patient_id',
         'staff_id',
     ];
 
     protected $casts = [
-        'date_consultation' => 'datetime',
+        'date' => 'date',
+        'heure' => 'datetime:H:i',
     ];
 
     public function patient()
@@ -28,8 +31,8 @@ class Consultation extends Model
         return $this->belongsTo(StaffMedical::class);
     }
 
-    public function ordonnance()
+    public function fileAttente()
     {
-        return $this->hasOne(Ordonnance::class);
+        return $this->hasOne(FileAttente::class, 'rendez_vous_id');
     }
 }
