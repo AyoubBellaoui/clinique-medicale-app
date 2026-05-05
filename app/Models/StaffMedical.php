@@ -23,6 +23,7 @@ class StaffMedical extends Model
 
         // Professional
         'specialite',
+        'license_number',
         'degree',
         'school',
         'grad_year',
@@ -37,6 +38,7 @@ class StaffMedical extends Model
 
         // System
         'role',
+        'color',
 
         // Notes
         'notes',
