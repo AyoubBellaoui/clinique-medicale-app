@@ -38,6 +38,10 @@ Route::middleware('auth')->group(function () {
     Route::put('/staff/{id}/update', [StaffMedicalController::class, 'update'])->name('staff.update');
     Route::delete('/Staff/delete/{id}', [StaffMedicalController::class, 'destroy'])->name('staff.delete');
 
+    // File d'attente
+    Route::get('/fileAttente', [FileAttenteController::class, 'index'])->name('fileAttente.index');
+    Route::get('/fileAttente/create', [FileAttenteController::class, 'create'])->name('fileAttente.create');
+
     // logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

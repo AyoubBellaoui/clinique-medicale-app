@@ -71,9 +71,9 @@ $statusMap = [
             <div class="accent-bar"></div>
             <div><h3>File d'Attente</h3><span>{{ count($queue) }} patients</span></div>
         </div>
-        <a href="{{ url('/queue/create') }}" class="btn btn-primary btn-sm">
+        <a href="{{ route('fileAttente.create') }}" class="btn btn-primary btn-sm">
             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-            Ajouter à la file
+            Ajouter à la file 
         </a>
     </div>
 

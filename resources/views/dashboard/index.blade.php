@@ -25,7 +25,7 @@
         </div>
         <svg class="stat-sparkline" viewBox="0 0 80 32" preserveAspectRatio="none">
             <path d="M0,24 L7,20 L14,22 L21,16 L28,18 L35,12 L42,14 L49,8 L56,10 L63,5 L70,7 L80,2"
-                  fill="none" stroke="#34a88c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                fill="none" stroke="#34a88c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
     </a>
 
@@ -37,13 +37,13 @@
             </svg>
         </div>
         <div class="stat-body">
-            <div class="stat-value">{{ $totalStaff ?? 0 }}</div>
-            <div class="stat-label">Staff Médical</div>
-            <div class="stat-trend up">↑ actifs aujourd'hui</div>
+            <div class="stat-value">{{ count($staff) }}</div>
+            <div class="stat-label">Total Staff</div>
+            <div class="stat-trend up">↑ Membres actifs</div>
         </div>
         <svg class="stat-sparkline" viewBox="0 0 80 32" preserveAspectRatio="none">
             <path d="M0,28 L7,24 L14,26 L21,20 L28,22 L35,16 L42,18 L49,12 L56,14 L63,8 L70,10 L80,5"
-                  fill="none" stroke="#3b82f6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                fill="none" stroke="#3b82f6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
     </a>
 
