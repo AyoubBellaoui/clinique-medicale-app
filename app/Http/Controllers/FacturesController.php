@@ -4,15 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class RendezVousController extends Controller
+class FacturesController extends Controller
 {
     public function index()
     {
-        return view('appointments.index');
+        return view('billing.index');
     }
 
     public function create()
     {
-        return view('appointments.create');
+        return view('billing.create');
     }
 }

@@ -7,6 +7,9 @@ use App\Http\Controllers\PatientController;
 use App\Http\Controllers\StaffMedicalController;
 use App\Http\Controllers\FileAttenteController;
 use App\Http\Controllers\ConsultationController;
+use App\Http\Controllers\OrdonnancesController;
+use App\Http\Controllers\RendezVousController;
+use App\Http\Controllers\FacturesController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\PatientsController;
 use App\Http\Controllers\SearchController;
@@ -41,6 +44,25 @@ Route::middleware('auth')->group(function () {
     // File d'attente
     Route::get('/fileAttente', [FileAttenteController::class, 'index'])->name('fileAttente.index');
     Route::get('/fileAttente/create', [FileAttenteController::class, 'create'])->name('fileAttente.create');
+
+    // Rendez-vous
+    Route::get('/appointments', [RendezVousController::class, 'index'])->name('appointments.index');
+    Route::get('/appointments/create', [RendezVousController::class, 'create'])->name('appointments.create');
+
+    // Consultations
+    Route::get('/consultations', [ConsultationController::class, 'index'])->name('consultations.index');
+    Route::get('/consultations/create', [ConsultationController::class, 'create'])->name('consultations.create');
+
+    // Ordonnances
+    Route::get('/prescriptions', [OrdonnancesController::class, 'index'])->name('prescriptions.index');
+    Route::get('/prescriptions/create', [OrdonnancesController::class, 'create'])->name('prescriptions.create');
+
+    // Factures
+    Route::get('/billing', [FacturesController::class, 'index'])->name('billing.index');
+    Route::get('/billing/create', [FacturesController::class, 'create'])->name('billing.create');
+
+    // Mon Compte
+    Route::get('/account', [AccountController::class, 'index'])->name('account.index');
 
     // logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
