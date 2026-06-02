@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ClinicPro — Connexion</title>
+    <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');})()</script>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:300,400,500,600,700&display=swap" rel="stylesheet" />
@@ -131,10 +132,134 @@
         .or-divider::after { background:linear-gradient(270deg,transparent,rgba(52,168,140,.2)); }
 
         .deco-cross { position:fixed; pointer-events:none; opacity:.09; }
+
+        /* Override browser autofill yellow highlight — light mode */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 1000px #f4faf8 inset !important;
+            -webkit-text-fill-color: #133c35 !important;
+            caret-color: #133c35;
+        }
+
+        /* Dark mode autofill */
+        html.dark input:-webkit-autofill,
+        html.dark input:-webkit-autofill:hover,
+        html.dark input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 1000px #0d1b24 inset !important;
+            -webkit-text-fill-color: #c8e6e0 !important;
+            caret-color: #c8e6e0;
+            border-color: rgba(52,168,140,.2) !important;
+        }
+
+        /* ─── Dark Mode Toggle Button ─── */
+        #theme-toggle-login {
+            position: fixed; top: 32px; right: 96px; z-index: 200;
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(255,255,255,.75); backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1.5px solid rgba(52,168,140,.25);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: #2e9278;
+            transition: all .25s; box-shadow: 0 4px 16px rgba(20,90,75,.12);
+        }
+        #theme-toggle-login:hover {
+            background: rgba(255,255,255,.95);
+            border-color: #34a88c;
+            transform: scale(1.08);
+            box-shadow: 0 6px 20px rgba(20,90,75,.18);
+        }
+        #theme-toggle-login .icon-moon { display: block; }
+        #theme-toggle-login .icon-sun  { display: none; }
+        html.dark #theme-toggle-login .icon-moon { display: none; }
+        html.dark #theme-toggle-login .icon-sun  { display: block; }
+
+        /* ─── Dark Mode ─── */
+        html.dark .page-bg {
+            background:
+                radial-gradient(ellipse 70% 55% at 15% 10%,  rgba(52,168,140,.08) 0%, transparent 60%),
+                radial-gradient(ellipse 55% 45% at 85% 85%,  rgba(30,120,100,.06) 0%, transparent 60%),
+                radial-gradient(ellipse 45% 40% at 55% 45%,  rgba(100,195,175,.04) 0%, transparent 60%),
+                #0d1b24;
+        }
+        html.dark .page-bg::before {
+            background-image:
+                linear-gradient(rgba(52,168,140,.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(52,168,140,.04) 1px, transparent 1px);
+        }
+        html.dark .card {
+            background: rgba(18,34,48,.96);
+            border-color: rgba(52,168,140,.18);
+            box-shadow: 0 8px 40px rgba(0,0,0,.4), 0 1px 4px rgba(0,0,0,.2);
+        }
+        html.dark #theme-toggle-login {
+            background: rgba(18,34,48,.6);
+            border-color: rgba(52,168,140,.3);
+            color: #5eead4;
+            box-shadow: 0 4px 16px rgba(0,0,0,.25), 0 0 0 1px rgba(52,168,140,.1);
+        }
+        html.dark #theme-toggle-login:hover {
+            background: rgba(30,52,66,.8);
+            border-color: #34a88c;
+            box-shadow: 0 6px 20px rgba(0,0,0,.3), 0 0 12px rgba(52,168,140,.2);
+        }
+        html.dark .field {
+            background-color: #0d1b24;
+            color: #c8e6e0;
+            border-color: rgba(52,168,140,.2);
+        }
+        html.dark .field::placeholder { color: #2d5e56; }
+        html.dark .field:focus {
+            background-color: #122230;
+            border-color: #34a88c;
+            box-shadow: 0 0 0 3px rgba(52,168,140,.12);
+        }
+        html.dark .field-icon    { color: #4d8a7e; }
+        html.dark .toggle-pw     { color: #4d8a7e; }
+        html.dark .toggle-pw:hover { color: #7ecab5; }
+        html.dark .forgot-link   { color: #5eead4; }
+        html.dark .forgot-link:hover { color: #7ecab5; }
+        html.dark .forgot-link::after { background: #5eead4; }
+        html.dark .divider {
+            background: linear-gradient(90deg, transparent, rgba(52,168,140,.15), transparent);
+        }
+        html.dark .or-divider span { color: #4d8a7e; }
+        html.dark .or-divider::before { background: linear-gradient(90deg, transparent, rgba(52,168,140,.12)); }
+        html.dark .or-divider::after  { background: linear-gradient(270deg, transparent, rgba(52,168,140,.12)); }
+        html.dark .err { color: #f87171; }
+
+        /* All hardcoded dark text colors on login page */
+        html.dark [style*="color:#133c35"]  { color: #cde8e2 !important; }
+        html.dark [style*="color:#7bbfb0"]  { color: #4d8a7e !important; }
+        html.dark [style*="color:#2e7a6a"]  { color: #5c9c90 !important; }
+        html.dark [style*="color:#4a9080"]  { color: #4d8a7e !important; }
+        html.dark [style*="color:#90c4b8"]  { color: #4d8a7e !important; }
+        html.dark [style*="color:#90b8b0"]  { color: #4d8a7e !important; }
+        html.dark [style*="color:#5db8a0"]  { color: #7ecab5 !important; }
+        html.dark [style*="color:#1a7260"]  { color: #5eead4 !important; }
+
+        /* Status/session message box */
+        html.dark [style*="background:#f0faf7"] {
+            background: rgba(52,168,140,.08) !important;
+            border-color: rgba(52,168,140,.25) !important;
+        }
+
+        /* Blob opacity boost in dark so they remain subtle */
+        html.dark .blob { opacity: .5; }
     </style>
 </head>
 
 <body class="page-bg flex items-center justify-center p-4 relative">
+
+    {{-- Dark mode toggle --}}
+    <button id="theme-toggle-login" title="Basculer mode sombre">
+        <svg class="icon-moon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+        </svg>
+        <svg class="icon-sun" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+        </svg>
+    </button>
 
     {{-- Blobs --}}
     <div class="blob float-a" style="width:320px;height:320px;top:-80px;left:-80px;background:rgba(52,168,140,.20);"></div>
@@ -335,6 +460,11 @@
     </div>
 
     <script>
+        document.getElementById('theme-toggle-login').addEventListener('click', () => {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+
         function togglePw() {
             const inp = document.getElementById('password');
             const ico = document.getElementById('eye-icon');

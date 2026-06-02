@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>ClinicPro – @yield('title', 'Tableau de bord')</title>
+    <script>(function(){if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');})()</script>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:300,400,500,600,700,800&family=fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet" />
@@ -1709,6 +1710,387 @@
         .badge-violet .dot {
             background: #7c3aed;
         }
+
+        /* Override browser autofill yellow highlight */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 1000px #fff inset !important;
+            -webkit-text-fill-color: #133c35 !important;
+            caret-color: #133c35;
+        }
+
+        html.dark input:-webkit-autofill,
+        html.dark input:-webkit-autofill:hover,
+        html.dark input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 1000px #0d1b24 inset !important;
+            -webkit-text-fill-color: #c8e6e0 !important;
+            caret-color: #c8e6e0;
+        }
+
+        /* ─── Dark Mode Toggle Button ─── */
+        #theme-toggle .icon-moon { display: block; }
+        #theme-toggle .icon-sun  { display: none; }
+        html.dark #theme-toggle .icon-moon { display: none; }
+        html.dark #theme-toggle .icon-sun  { display: block; }
+
+        /* ─── Dark Mode Overrides ─── */
+        html.dark {
+            --ink: #c8e6e0;
+            --muted: #4d8a7e;
+            --soft: #3d7a6e;
+            /* Tint overrides — affects all inline var() references automatically */
+            --teal-50:  rgba(52, 168, 140, 0.07);
+            --teal-100: rgba(52, 168, 140, 0.13);
+            /* Text-color overrides — dark teal on dark bg = invisible */
+            --teal-600: #2dd4bf;
+            --teal-700: #7ecab5;
+            --teal-800: #cde8e2;
+        }
+
+        html.dark body {
+            background: #0d1b24;
+            color: #c8e6e0;
+        }
+
+        html.dark .header {
+            background: rgba(13, 27, 36, .88);
+            border-bottom-color: rgba(52, 168, 140, .12);
+            box-shadow: 0 1px 8px rgba(0, 0, 0, .2);
+        }
+
+        html.dark .sidebar-toggle,
+        html.dark .header-btn {
+            background: rgba(52, 168, 140, .08);
+            border-color: rgba(52, 168, 140, .15);
+        }
+
+        html.dark .sidebar-toggle:hover,
+        html.dark .header-btn:hover {
+            background: rgba(52, 168, 140, .16);
+            border-color: rgba(52, 168, 140, .35);
+        }
+
+        html.dark .header-clock {
+            border-right-color: rgba(52, 168, 140, .12);
+        }
+
+        html.dark .header-clock .time { color: #7ecab5; }
+        html.dark .header-clock .date { color: #4d8a7e; }
+
+        html.dark .header-title h2 { color: #cde8e2; }
+        html.dark .header-title p  { color: #4d8a7e; }
+
+        html.dark .header-search {
+            background: rgba(52, 168, 140, .06);
+            border-color: rgba(52, 168, 140, .15);
+        }
+
+        html.dark .header-search:focus-within {
+            background: rgba(52, 168, 140, .1);
+            border-color: var(--teal-400);
+        }
+
+        html.dark .header-search input { color: #c8e6e0; }
+
+        html.dark .kbd {
+            background: #162a34;
+            color: #4d8a7e;
+            border-color: rgba(52, 168, 140, .15);
+        }
+
+        html.dark .search-dropdown {
+            background: #122230;
+            border-color: rgba(52, 168, 140, .15);
+        }
+
+        html.dark .header-notif::after { border-color: #0d1b24; }
+
+        html.dark .stat-card,
+        html.dark .card {
+            background: #122230;
+            border-color: rgba(52, 168, 140, .12);
+        }
+
+        html.dark .stat-value { color: #cde8e2; }
+        html.dark .stat-label { color: #4d8a7e; }
+
+        html.dark .section-title h3 { color: #cde8e2; }
+        html.dark .section-title span { color: #3d7a6e; }
+
+        html.dark .card-header {
+            border-bottom-color: rgba(52, 168, 140, .08);
+        }
+
+        html.dark .chart-legend {
+            border-top-color: rgba(52, 168, 140, .12);
+        }
+
+        html.dark .legend-item { color: #7ecab5; }
+
+        html.dark thead tr {
+            background: linear-gradient(to bottom, #162a34, #122230 150%);
+        }
+
+        html.dark thead th {
+            color: #4d8a7e;
+            border-bottom-color: rgba(52, 168, 140, .1);
+        }
+
+        html.dark tbody tr { border-top-color: rgba(52, 168, 140, .06); }
+        html.dark tbody tr:hover { background: #162a34; }
+        html.dark tbody td { color: #c8e6e0; }
+        html.dark .table-empty { color: #4d8a7e; }
+
+        html.dark .queue-item { border-bottom-color: rgba(52, 168, 140, .06); }
+        html.dark .queue-item:hover { background: #162a34; }
+        html.dark .queue-info p { color: #c8e6e0; }
+
+        html.dark .activity-item { border-bottom-color: rgba(52, 168, 140, .06); }
+        html.dark .activity-item:hover { background: #162a34; }
+        html.dark .activity-info p { color: #c8e6e0; }
+
+        html.dark .avatar-info p { color: #cde8e2; }
+
+        html.dark .btn-outline {
+            background: rgba(52, 168, 140, .08);
+            border-color: rgba(52, 168, 140, .2);
+            color: var(--teal-300);
+        }
+
+        html.dark .btn-outline:hover {
+            background: rgba(52, 168, 140, .15);
+            border-color: var(--teal-400);
+        }
+
+        html.dark .btn-ghost { color: var(--teal-300); }
+        html.dark .btn-ghost:hover { background: rgba(52, 168, 140, .08); }
+
+        html.dark .btn-danger {
+            background: rgba(244, 63, 94, .12);
+            border-color: rgba(244, 63, 94, .25);
+        }
+
+        html.dark .tabs {
+            background: rgba(52, 168, 140, .06);
+            border-color: rgba(52, 168, 140, .12);
+        }
+
+        html.dark .tab { color: #4d8a7e; }
+
+        html.dark .tab.active {
+            background: #162a34;
+            color: var(--teal-300);
+        }
+
+        html.dark .pagination { border-top-color: rgba(52, 168, 140, .08); }
+        html.dark .pagination span { color: #4d8a7e; }
+
+        html.dark .page-btn {
+            border-color: rgba(52, 168, 140, .15);
+            color: var(--teal-300);
+        }
+
+        html.dark .page-btn:hover:not(:disabled) {
+            background: rgba(52, 168, 140, .08);
+            border-color: var(--teal-400);
+        }
+
+        html.dark .toast {
+            background: #122230;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .4);
+        }
+
+        html.dark .toast-body { color: #c8e6e0; }
+
+        html.dark .modal { background: #122230; }
+
+        html.dark .modal-header { border-bottom-color: rgba(52, 168, 140, .08); }
+
+        html.dark .modal-footer {
+            background: #0d1b24;
+            border-top-color: rgba(52, 168, 140, .08);
+        }
+
+        html.dark .modal-close {
+            background: rgba(52, 168, 140, .08);
+            color: var(--teal-300);
+        }
+
+        html.dark .modal-close:hover { background: rgba(52, 168, 140, .16); }
+
+        html.dark .form-label { color: #5c9c90; }
+
+        html.dark .form-input,
+        html.dark .form-select,
+        html.dark .form-textarea {
+            background-color: #0d1b24;
+            border-color: rgba(52, 168, 140, .18);
+            color: #c8e6e0;
+        }
+
+        html.dark .form-input::placeholder,
+        html.dark .form-textarea::placeholder { color: #2d5e56; }
+
+        html.dark .form-input:focus,
+        html.dark .form-select:focus,
+        html.dark .form-textarea:focus {
+            background-color: #122230;
+            border-color: var(--teal-400);
+        }
+
+        html.dark .skeleton {
+            background: linear-gradient(90deg, #162a34 0%, #1e3a48 50%, #162a34 100%);
+            background-size: 200% 100%;
+        }
+
+        html.dark .badge-teal   { background: rgba(15, 118, 110, .2);  color: #5eead4; }
+        html.dark .badge-blue   { background: rgba(37, 99, 235, .2);   color: #93c5fd; }
+        html.dark .badge-amber  { background: rgba(217, 119, 6, .2);   color: #fcd34d; }
+        html.dark .badge-violet { background: rgba(124, 58, 237, .2);  color: #c4b5fd; }
+        html.dark .badge-rose   { background: rgba(225, 29, 72, .2);   color: #fda4af; }
+        html.dark .badge-green  { background: rgba(5, 150, 105, .2);   color: #6ee7b7; }
+        html.dark .badge-gray   { background: rgba(71, 85, 105, .2);   color: #94a3b8; }
+
+        html.dark .badge-teal .dot   { background: #5eead4; }
+        html.dark .badge-blue .dot   { background: #93c5fd; }
+        html.dark .badge-amber .dot  { background: #fcd34d; }
+        html.dark .badge-violet .dot { background: #c4b5fd; }
+
+        /* ─── Page-specific dark overrides ─── */
+
+        /* .form-control used across all create/edit pages */
+        html.dark .form-control {
+            background-color: #0d1b24;
+            border-color: rgba(52, 168, 140, .18);
+            color: #c8e6e0;
+        }
+
+        html.dark .form-control::placeholder { color: #2d5e56; }
+
+        html.dark .form-control:focus {
+            background-color: #122230;
+            border-color: var(--teal-400);
+            box-shadow: 0 0 0 3px rgba(52, 168, 140, .12);
+        }
+
+        html.dark .form-control:hover:not(:focus) {
+            border-color: rgba(52, 168, 140, .35);
+        }
+
+        html.dark select.form-control {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234d8a7e' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        }
+
+        /* Calendar cells (appointments/index) */
+        html.dark .calendar-day-label { color: #4d8a7e; }
+
+        html.dark .calendar-day:hover {
+            background: #162a34 !important;
+            border-color: var(--teal-400);
+        }
+
+        html.dark .cal-count {
+            background: rgba(52, 168, 140, .15);
+            color: var(--teal-300);
+        }
+
+        /* Exam checkboxes (consultations/create) */
+        html.dark .exam-check-row {
+            background: #0d1b24;
+            border-color: rgba(52, 168, 140, .15);
+        }
+
+        html.dark .exam-check-row:has(input:checked) {
+            background: rgba(52, 168, 140, .08);
+            border-color: var(--teal-400);
+        }
+
+        /* Time slot buttons (appointments/create) */
+        html.dark .slot-btn {
+            border-color: rgba(52, 168, 140, .2);
+            background: rgba(52, 168, 140, .05);
+            color: var(--teal-300);
+        }
+
+        html.dark .slot-btn.slot-taken {
+            background: rgba(71, 85, 105, .12);
+            border-color: rgba(71, 85, 105, .15);
+            color: #475569;
+        }
+
+        /* Inline background:#fff on toggle/choice buttons across pages */
+        html.dark .gender-btn,
+        html.dark .blood-btn,
+        html.dark .prio-btn {
+            background: #0d1b24 !important;
+            color: #7ecab5 !important;
+        }
+
+        /* Catch-all for any <button> or <a> with hardcoded inline white background */
+        html.dark button[style*="background:#fff"] {
+            background: #0d1b24 !important;
+        }
+
+        html.dark a[style*="background:#fff"] {
+            background: #0d1b24 !important;
+        }
+
+        /* Any div with a hardcoded white inline background (account cards, profile card, etc.) */
+        html.dark div[style*="background:#fff"] {
+            background: #122230 !important;
+        }
+
+        /* Consultation table N/A indicators */
+        html.dark span[style*="background:#f0f7f5"] {
+            background: rgba(71, 85, 105, .15) !important;
+            color: #64748b !important;
+        }
+
+        /* Prescription cards (.rx-card has background:linear-gradient(135deg,#fff,...)) */
+        html.dark .rx-card {
+            background: linear-gradient(135deg, #162a34, #122230) !important;
+            border-color: rgba(52, 168, 140, .15) !important;
+        }
+
+        html.dark .rx-med { color: var(--teal-300) !important; }
+        html.dark .rx-meds { border-top-color: rgba(52, 168, 140, .15) !important; }
+
+        /* Account tabs container */
+        html.dark #account-tabs {
+            background: #122230 !important;
+            border-color: rgba(52, 168, 140, .12) !important;
+        }
+
+        /* Account toggle switches */
+        html.dark .toggle-switch {
+            background: rgba(52, 168, 140, .2);
+        }
+
+        /* Fix select arrow — use background-color not background shorthand, and set a dark-mode arrow */
+        html.dark select.form-control,
+        html.dark .form-select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234d8a7e' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 13px center;
+        }
+
+        /* Input error highlight */
+        html.dark .input-error {
+            background: rgba(239, 68, 68, .07) !important;
+            border-color: #ef4444 !important;
+        }
+
+        /* Summary mini-cards on billing/index (inline background starts with #fff) */
+        html.dark [style*="background:linear-gradient(135deg,#fff"] {
+            background: linear-gradient(135deg, #122230, #162a34) !important;
+        }
+
+        /* Staff index card with var(--teal-50) gradient */
+        html.dark [style*="background:linear-gradient(135deg,var(--teal-50),#fff)"] {
+            background: #122230 !important;
+            border-color: rgba(52, 168, 140, .15) !important;
+        }
     </style>
 </head>
 
@@ -1856,6 +2238,15 @@
                 <div class="search-dropdown" id="search-dropdown"></div>
             </div>
 
+            <button class="header-btn" id="theme-toggle" title="Basculer mode sombre">
+                <svg class="icon-moon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                </svg>
+                <svg class="icon-sun" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+                </svg>
+            </button>
+
             <button class="header-btn header-notif" title="Notifications">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
@@ -1962,6 +2353,13 @@
             if (!e.target.closest('.header-search')) {
                 document.getElementById('search-dropdown').classList.remove('show');
             }
+        });
+
+        // ─── Dark Mode ───
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            const html = document.documentElement;
+            const isDark = html.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
         });
     </script>
 
