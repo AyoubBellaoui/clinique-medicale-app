@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:300,400,500,600,700,800&family=fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.css" rel="stylesheet" />
 
     @stack('styles')
 
@@ -2091,6 +2092,161 @@
             background: #122230 !important;
             border-color: rgba(52, 168, 140, .15) !important;
         }
+
+        /* ─── Flowbite Datepicker popup ─── */
+        .datepicker {
+            z-index: 9999;
+        }
+        .datepicker-picker {
+            background: #fff;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 10px 30px rgba(0,0,0,.12), 0 2px 8px rgba(0,0,0,.06);
+            padding: 16px;
+            width: 280px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 14px;
+        }
+        .datepicker-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .datepicker-controls button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #111827;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            line-height: 1;
+            transition: background .15s;
+        }
+        .datepicker-controls button:hover {
+            background: #f3f4f6;
+        }
+        .datepicker-controls .view-switch {
+            flex: 1;
+            text-align: center;
+            font-size: 14px;
+        }
+        .datepicker-view table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .datepicker-view .days-of-week th,
+        .datepicker-view .dow {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            padding: 4px 0 8px;
+        }
+        .datepicker-cell {
+            text-align: center;
+            padding: 6px 0;
+            cursor: pointer;
+            border-radius: 8px;
+            color: #111827;
+            font-size: 13px;
+            font-weight: 400;
+            transition: background .12s, color .12s;
+            line-height: 1.6;
+        }
+        .datepicker-cell:not(.disabled):not(.selected):hover {
+            background: #f3f4f6;
+        }
+        .datepicker-cell.selected,
+        .datepicker-cell.selected:hover {
+            background: #1c64f2;
+            color: #fff;
+            font-weight: 600;
+            border-radius: 8px;
+        }
+        .datepicker-cell.today:not(.selected) {
+            color: #1c64f2;
+            font-weight: 700;
+        }
+        .datepicker-cell.prev-month,
+        .datepicker-cell.next-month {
+            color: #d1d5db;
+        }
+        .datepicker-cell.disabled {
+            color: #e5e7eb;
+            cursor: not-allowed;
+        }
+        .datepicker-cell.focused:not(.selected) {
+            background: #eff6ff;
+        }
+        /* Days-of-week header — always 7 columns */
+        .datepicker-view .days-of-week {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            margin-bottom: 4px;
+        }
+        /* Days grid — 7 columns (target by .day cell content) */
+        .datepicker-view.days .datepicker-grid,
+        .datepicker-grid:has(.day) {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+        }
+        /* Month/Year/Decade grid — 4 columns (target by cell content) */
+        .datepicker-view.months .datepicker-grid,
+        .datepicker-view.years .datepicker-grid,
+        .datepicker-view.decades .datepicker-grid,
+        .datepicker-grid:has(.month),
+        .datepicker-grid:has(.year),
+        .datepicker-grid:has(.decade) {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+        }
+        .datepicker-grid:has(.month) .datepicker-cell,
+        .datepicker-grid:has(.year) .datepicker-cell,
+        .datepicker-grid:has(.decade) .datepicker-cell {
+            padding: 10px 4px;
+            text-align: center;
+            border-radius: 8px;
+        }
+        /* Dark mode */
+        html.dark .datepicker-picker {
+            background: #1e2a3a;
+            border-color: rgba(255,255,255,.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,.4);
+        }
+        html.dark .datepicker-controls button {
+            color: #e5e7eb;
+        }
+        html.dark .datepicker-controls button:hover {
+            background: #2d3d50;
+        }
+        html.dark .datepicker-view .dow,
+        html.dark .datepicker-view .days-of-week th {
+            color: #9ca3af;
+        }
+        html.dark .datepicker-cell {
+            color: #e5e7eb;
+        }
+        html.dark .datepicker-cell:not(.disabled):not(.selected):hover {
+            background: #2d3d50;
+        }
+        html.dark .datepicker-cell.prev-month,
+        html.dark .datepicker-cell.next-month {
+            color: #4b5563;
+        }
+        html.dark .datepicker-cell.today:not(.selected) {
+            color: #60a5fa;
+        }
+        html.dark .datepicker-cell.focused:not(.selected) {
+            background: #1e3a5f;
+        }
     </style>
 </head>
 
@@ -2361,6 +2517,14 @@
             const isDark = html.classList.toggle('dark');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
         });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
+    <script>
+        // Relay Flowbite's changeDate event as a native change event so onchange handlers fire
+        document.addEventListener('changeDate', function(e) {
+            e.target.dispatchEvent(new Event('change', { bubbles: true }));
+        }, true);
     </script>
 
     @stack('scripts')

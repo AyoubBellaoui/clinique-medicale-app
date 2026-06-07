@@ -148,7 +148,7 @@
                             <label class="form-label">Date de naissance</label>
                             <div style="position:relative;">
                                 <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg>
-                                <input type="date" class="form-control pf-input @error('date_naissance') input-error @enderror" name="date_naissance" id="dob_field" value="{{ old('date_naissance') }}" oninput="updatePreview()" style="padding-left:36px;">
+                                <input datepicker datepicker-autohide datepicker-format="yyyy-mm-dd" type="text" class="form-control pf-input @error('date_naissance') input-error @enderror" name="date_naissance" id="dob_field" value="{{ old('date_naissance') }}" onchange="updatePreview()" placeholder="aaaa-mm-jj" autocomplete="off" style="padding-left:36px;">
                             </div>
                             @error('date_naissance')<div class="field-error">{{ $message }}</div>@enderror
                         </div>
@@ -364,7 +364,7 @@
                             <label class="form-label">Date d'embauche <span style="color:#f43f5e;">*</span></label>
                             <div style="position:relative;">
                                 <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5" /></svg>
-                                <input type="date" class="form-control pf-input @error('date_embauche') input-error @enderror" name="date_embauche" id="hire_date_field" value="{{ old('date_embauche') }}" oninput="updatePreview()" style="padding-left:36px;">
+                                <input datepicker datepicker-autohide datepicker-format="yyyy-mm-dd" type="text" class="form-control pf-input @error('date_embauche') input-error @enderror" name="date_embauche" id="hire_date_field" value="{{ old('date_embauche') }}" onchange="updatePreview()" placeholder="aaaa-mm-jj" autocomplete="off" style="padding-left:36px;">
                             </div>
                             @error('date_embauche')<div class="field-error">{{ $message }}</div>@enderror
                         </div>
