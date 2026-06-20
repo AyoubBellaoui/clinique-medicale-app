@@ -16,8 +16,8 @@
             </svg>
         </div>
         <div class="stat-body">
-            <div class="stat-value">{{ $patients->count() ?? 0 }}</div>
-            <div class="stat-label">Total Patients</div> 
+            <div class="stat-value">{{ count($patients) }}</div>
+            <div class="stat-label">Total Patients</div>
         </div>
     </div>
 
@@ -28,7 +28,7 @@
             </svg>
         </div>
         <div class="stat-body">
-            <div class="stat-value">{{ $patients->where('gender', 'M')->count() ?? 0 }}</div>
+            <div class="stat-value">{{ collect($patients)->where('genre', 'M')->count() }}</div>
             <div class="stat-label">Hommes</div>
         </div>
     </div>
@@ -40,7 +40,7 @@
             </svg>
         </div>
         <div class="stat-body">
-            <div class="stat-value">{{ $patients->where('gender', 'F')->count() ?? 0 }}</div>
+            <div class="stat-value">{{ collect($patients)->where('genre', 'F')->count() }}</div>
             <div class="stat-label">Femmes</div>
         </div>
     </div>
@@ -52,7 +52,7 @@
             </svg>
         </div>
         <div class="stat-body">
-            <div class="stat-value">{{ $patients->where('status', 'actif')->count() ?? 0 }}</div>
+            <div class="stat-value">{{ $patients->where('statut_dossier', 'actif')->count() }}</div>
             <div class="stat-label">Actifs</div>
         </div>
     </div>
@@ -66,7 +66,7 @@
             <div class="accent-bar"></div>
             <div>
                 <h3>Patients</h3>
-                <span>{{ $patients->count() ?? 0 }} patients enregistrés</span>
+                <span>{{ count($patients) }} patients enregistrés</span>
             </div>
         </div>
 
@@ -77,14 +77,19 @@
                         d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
                 </svg>
                 <input type="text"
+                    id="patient-search"
                     placeholder="Rechercher un patient..."
-                    style="border:none;outline:none;background:none;font-size:13px;font-family:inherit;color:var(--teal-800);width:200px;">
+                    style="border:none;outline:none;background:none;font-size:13px;font-family:inherit;color:var(--teal-800);width:200px;"
+                    autocomplete="off">
             </div>
 
             <button class="btn btn-outline btn-sm">Exporter</button>
 
             <a href="{{ route('patients.create') }}" class="btn btn-primary btn-sm">
-                ➕ Nouveau Patient
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                </svg>
+                Nouveau Patient
             </a>
         </div>
     </div>
@@ -104,16 +109,19 @@
                 </tr>
             </thead>
 
-            <tbody>
+            <tbody id="patients-tbody">
                 @forelse($patients as $p)
-                    <tr>
+                    <tr data-search="{{ strtolower($p->prenom . ' ' . $p->nom . ' ' . $p->cin . ' ' . ($p->email ?? '') . ' ' . ($p->telephone ?? '') . ' ' . ($p->groupe_sanguin ?? '')) }}">
                         <td>
                             <div class="avatar-chip">
+                                @php
+                                    $initials = strtoupper(substr($p->prenom ?? '', 0, 1) . substr($p->nom ?? '', 0, 1));
+                                @endphp
                                 <div class="avatar {{ $p->color ?? 'teal' }}">
-                                    {{ $p->initials ?? '' }}
+                                    {{ $initials ?: '?' }}
                                 </div>
                                 <div class="avatar-info">
-                                    <p>{{ $p->name }}</p>
+                                    <p>{{ $p->prenom }} {{ $p->nom }}</p>
                                     <span>{{ $p->email }}</span>
                                 </div>
                             </div>
@@ -121,32 +129,53 @@
 
                         <td><span class="text-mono">{{ $p->cin }}</span></td>
 
-                        <td>{{ $p->age }} ans</td>
+                        <td>
+                            @if($p->date_naissance)
+                                {{ \Carbon\Carbon::parse($p->date_naissance)->age }} ans
+                            @else
+                                <span style="color:var(--muted);">—</span>
+                            @endif
+                        </td>
 
                         <td>
-                            <span class="badge badge-{{ $p->gender === 'F' ? 'rose' : 'blue' }}">
-                                {{ $p->gender === 'F' ? 'Féminin' : 'Masculin' }}
+                            <span class="badge badge-{{ $p->genre === 'F' ? 'rose' : 'blue' }}">
+                                {{ $p->genre === 'F' ? 'Féminin' : 'Masculin' }}
                             </span>
                         </td>
 
                         <td>
-                            <span style="font-size:12.5px;font-weight:700;color:var(--teal-700);
-                                background:rgba(52,168,140,.08);padding:3px 10px;border-radius:6px;">
-                                {{ $p->blood }}
-                            </span>
+                            @if($p->groupe_sanguin)
+                                <span style="font-size:12.5px;font-weight:700;color:var(--teal-700);
+                                    background:rgba(52,168,140,.08);padding:3px 10px;border-radius:6px;">
+                                    {{ $p->groupe_sanguin }}
+                                </span>
+                            @else
+                                <span style="color:var(--muted);">—</span>
+                            @endif
                         </td>
 
-                        <td style="color:var(--muted);">
-                            {{ $p->last_visit ?? '-' }}
-                        </td>
+                        <td style="color:var(--muted);">—</td>
 
-                        <td>{{ $p->phone }}</td>
+                        <td>{{ $p->telephone ?? '—' }}</td>
 
                         <td>
                             <div style="display:flex;gap:4px;">
-                                <button class="btn btn-outline btn-sm btn-icon-only" title="Voir">👁</button>
-                                <button class="btn btn-outline btn-sm btn-icon-only" title="Modifier">✏️</button>
-                                <button class="btn btn-danger btn-sm btn-icon-only" title="Supprimer">🗑</button>
+                                <a href="{{ route('patients.edit', $p->id) }}"
+                                   class="btn btn-outline btn-sm btn-icon-only" title="Modifier">
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/>
+                                    </svg>
+                                </a>
+                                <form method="POST" action="{{ route('patients.delete', $p->id) }}"
+                                      onsubmit="return confirm('Supprimer ce patient ?')" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm btn-icon-only" title="Supprimer">
+                                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+                                        </svg>
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>
@@ -157,6 +186,12 @@
                         </td>
                     </tr>
                 @endforelse
+                <tr id="patient-no-results" style="display:none;">
+                    <td colspan="8" style="text-align:center;padding:30px 20px;color:var(--muted);">
+                        <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto 8px;display:block;opacity:.5;"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                        Aucun patient ne correspond à votre recherche
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -167,3 +202,19 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+document.getElementById('patient-search').addEventListener('input', function () {
+    const q = this.value.toLowerCase().trim();
+    const rows = document.querySelectorAll('#patients-tbody tr[data-search]');
+    let visible = 0;
+    rows.forEach(row => {
+        const match = !q || row.dataset.search.includes(q);
+        row.style.display = match ? '' : 'none';
+        if (match) visible++;
+    });
+    document.getElementById('patient-no-results').style.display = (visible === 0 && q) ? '' : 'none';
+});
+</script>
+@endpush

@@ -111,12 +111,25 @@ const STAFF_DATA = {!! json_encode($staffForJs) !!};
             </div>
         </div>
 
-        <a href="{{ url('/staff/create') }}" class="btn btn-primary btn-sm">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-            </svg>
-            Nouveau Membre
-        </a>
+        <div style="display:flex;align-items:center;gap:8px;">
+            <div style="display:flex;align-items:center;gap:8px;background:var(--teal-50);border:1.5px solid rgba(52,168,140,.2);border-radius:10px;padding:8px 14px;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--muted);flex-shrink:0;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+                </svg>
+                <input type="text"
+                    id="staff-search"
+                    placeholder="Rechercher un membre..."
+                    style="border:none;outline:none;background:none;font-size:13px;font-family:inherit;color:var(--teal-800);width:180px;"
+                    autocomplete="off">
+            </div>
+
+            <a href="{{ route('staff.create') }}" class="btn btn-primary btn-sm">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                </svg>
+                Nouveau Membre
+            </a>
+        </div>
     </div>
 
     <div class="table-wrap">
@@ -133,9 +146,10 @@ const STAFF_DATA = {!! json_encode($staffForJs) !!};
                 </tr>
             </thead>
 
-            <tbody>
+            <tbody id="staff-tbody">
                 @forelse($staff as $s)
-                <tr style="cursor:pointer;" onclick="openStaffModal({{ $s->id }})">
+                <tr style="cursor:pointer;" onclick="openStaffModal({{ $s->id }})"
+                    data-search="{{ strtolower($s->prenom . ' ' . $s->nom . ' ' . ($s->email ?? '') . ' ' . ($s->telephone ?? '') . ' ' . ($s->specialite ?? '') . ' ' . ($s->role ?? '')) }}">
 
                     {{-- MEMBER --}}
                     <td>
@@ -242,6 +256,12 @@ const STAFF_DATA = {!! json_encode($staffForJs) !!};
                     </td>
                 </tr>
                 @endforelse
+                <tr id="staff-no-results" style="display:none;">
+                    <td colspan="7" style="text-align:center;padding:30px 20px;color:var(--muted);">
+                        <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto 8px;display:block;opacity:.5;"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+                        Aucun membre ne correspond à votre recherche
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -570,6 +590,19 @@ function switchSTab(btn, tab) {
 
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeStaffModal();
+});
+
+/* ── Live search ── */
+document.getElementById('staff-search').addEventListener('input', function () {
+    const q = this.value.toLowerCase().trim();
+    const rows = document.querySelectorAll('#staff-tbody tr[data-search]');
+    let visible = 0;
+    rows.forEach(row => {
+        const match = !q || row.dataset.search.includes(q);
+        row.style.display = match ? '' : 'none';
+        if (match) visible++;
+    });
+    document.getElementById('staff-no-results').style.display = (visible === 0 && q) ? '' : 'none';
 });
 </script>
 

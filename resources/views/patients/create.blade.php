@@ -34,7 +34,7 @@
 </div>
 
 <!----------------------------------------------------- Patient Form -------------------------------------------------->
-<form action="{{ url('/patients') }}" method="POST" id="patientForm">
+<form action="{{ route('patients.store') }}" method="POST" id="patientForm">
 @csrf
 
 {{-- Two-column layout --}}
@@ -84,8 +84,9 @@
                         <label class="form-label">Prénom <span style="color:#f43f5e;">*</span></label>
                         <div style="position:relative;">
                             <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg>
-                            <input type="text" class="form-control pf-input" name="first_name" id="first_name" placeholder="Prénom" oninput="updatePreview()" style="padding-left:36px;">
+                            <input type="text" class="form-control pf-input @error('prenom') input-error @enderror" name="prenom" id="prenom" placeholder="Prénom" value="{{ old('prenom') }}" oninput="updatePreview()" style="padding-left:36px;">
                         </div>
+                        @error('prenom')<div class="field-error">{{ $message }}</div>@enderror
                     </div>
 
                     {{-- Last name --}}
@@ -93,8 +94,9 @@
                         <label class="form-label">Nom <span style="color:#f43f5e;">*</span></label>
                         <div style="position:relative;">
                             <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg>
-                            <input type="text" class="form-control pf-input" name="last_name" id="last_name" placeholder="Nom de famille" oninput="updatePreview()" style="padding-left:36px;">
+                            <input type="text" class="form-control pf-input @error('nom') input-error @enderror" name="nom" id="nom" placeholder="Nom de famille" value="{{ old('nom') }}" oninput="updatePreview()" style="padding-left:36px;">
                         </div>
+                        @error('nom')<div class="field-error">{{ $message }}</div>@enderror
                     </div>
 
                     {{-- CIN --}}
@@ -102,8 +104,9 @@
                         <label class="form-label">CIN / N° Dossier <span style="color:#f43f5e;">*</span></label>
                         <div style="position:relative;">
                             <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z"/></svg>
-                            <input type="text" class="form-control text-mono pf-input" name="cin" id="cin_field" placeholder="Ex: A123456" oninput="updatePreview()" style="padding-left:36px;letter-spacing:.05em;">
+                            <input type="text" class="form-control text-mono pf-input @error('cin') input-error @enderror" name="cin" id="cin_field" placeholder="Ex: A123456" value="{{ old('cin') }}" oninput="updatePreview()" style="padding-left:36px;letter-spacing:.05em;">
                         </div>
+                        @error('cin')<div class="field-error">{{ $message }}</div>@enderror
                     </div>
 
                     {{-- DOB --}}
@@ -111,14 +114,14 @@
                         <label class="form-label">Date de naissance</label>
                         <div style="position:relative;">
                             <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
-                            <input datepicker datepicker-autohide datepicker-format="yyyy-mm-dd" type="text" class="form-control" name="dob" id="dob_field" onchange="updatePreview()" placeholder="aaaa-mm-jj" autocomplete="off" style="padding-left:36px;">
+                            <input datepicker datepicker-autohide datepicker-format="yyyy-mm-dd" type="text" class="form-control" name="date_naissance" id="dob_field" onchange="updatePreview()" placeholder="aaaa-mm-jj" autocomplete="off" style="padding-left:36px;">
                         </div>
                     </div>
 
                     {{-- Gender toggle --}}
                     <div class="form-group" style="margin-bottom:0;">
                         <label class="form-label">Sexe</label>
-                        <input type="hidden" name="gender" id="gender_input" value="">
+                        <input type="hidden" name="genre" id="gender_input" value="">
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                             <button type="button" class="gender-btn" id="btn-M" onclick="selectGender('M')" style="padding:10px;border-radius:10px;border:1.5px solid rgba(52,168,140,.2);background:#fff;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .2s;">
                                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14.25c-1.242 0-2.25-1.008-2.25-2.25s1.008-2.25 2.25-2.25 2.25 1.008 2.25 2.25-1.008 2.25-2.25 2.25zM12 14.25v5.25m0 0H9.75m2.25 0H14.25M12 5.25a6.75 6.75 0 100 13.5 6.75 6.75 0 000-13.5z"/></svg>
@@ -134,7 +137,7 @@
                     {{-- Blood type pills --}}
                     <div class="form-group" style="margin-bottom:0;">
                         <label class="form-label">Groupe sanguin</label>
-                        <input type="hidden" name="blood_type" id="blood_input" value="">
+                        <input type="hidden" name="groupe_sanguin" id="blood_input" value="">
                         <div style="display:flex;flex-wrap:wrap;gap:6px;">
                             @foreach(['A+','A-','B+','B-','AB+','AB-','O+','O-'] as $bt)
                             <button type="button" class="blood-btn" data-bt="{{ $bt }}" onclick="selectBlood('{{ $bt }}')" style="padding:7px 12px;border-radius:8px;border:1.5px solid rgba(52,168,140,.2);background:#fff;color:var(--muted);font-size:12.5px;font-weight:700;cursor:pointer;transition:all .2s;font-variant-numeric:tabular-nums;">
@@ -149,8 +152,9 @@
                         <label class="form-label">Téléphone</label>
                         <div style="position:relative;">
                             <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/></svg>
-                            <input type="tel" class="form-control pf-input" name="phone" id="phone_field" placeholder="+212 6xx xxx xxx" oninput="updatePreview()" style="padding-left:36px;">
+                            <input type="tel" class="form-control pf-input @error('telephone') input-error @enderror" name="telephone" id="phone_field" placeholder="+212 6xx xxx xxx" value="{{ old('telephone') }}" oninput="updatePreview()" style="padding-left:36px;">
                         </div>
+                        @error('telephone')<div class="field-error">{{ $message }}</div>@enderror
                     </div>
 
                     {{-- Email --}}
@@ -158,8 +162,9 @@
                         <label class="form-label">Email</label>
                         <div style="position:relative;">
                             <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
-                            <input type="email" class="form-control" name="email" placeholder="patient@email.com" style="padding-left:36px;">
+                            <input type="email" class="form-control @error('email') input-error @enderror" name="email" placeholder="patient@email.com" value="{{ old('email') }}" style="padding-left:36px;">
                         </div>
+                        @error('email')<div class="field-error">{{ $message }}</div>@enderror
                     </div>
 
                     {{-- Address --}}
@@ -167,7 +172,7 @@
                         <label class="form-label">Adresse</label>
                         <div style="position:relative;">
                             <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
-                            <input type="text" class="form-control" name="address" placeholder="Adresse complète" style="padding-left:36px;">
+                            <input type="text" class="form-control" name="adresse" placeholder="Adresse complète" style="padding-left:36px;">
                         </div>
                     </div>
 
@@ -227,7 +232,7 @@
                     {{-- History --}}
                     <div class="form-group" style="margin-bottom:0;grid-column:1/-1;">
                         <label class="form-label">Antécédents médicaux</label>
-                        <textarea class="form-control" name="history" rows="4" placeholder="Maladies chroniques, chirurgies antérieures, hospitalisations, traitements en cours…" style="resize:vertical;line-height:1.6;"></textarea>
+                        <textarea class="form-control" name="antecedents" rows="4" placeholder="Maladies chroniques, chirurgies antérieures, hospitalisations, traitements en cours…" style="resize:vertical;line-height:1.6;"></textarea>
                     </div>
 
                     {{-- Doctor --}}
@@ -235,11 +240,13 @@
                         <label class="form-label">Médecin traitant</label>
                         <div style="position:relative;">
                             <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5"/></svg>
-                            <select class="form-control form-select" name="doctor_id" id="doctor_field" onchange="updatePreview()" style="padding-left:36px;">
+                            <select class="form-control form-select" name="medecin_id" id="doctor_field" onchange="updatePreview()" style="padding-left:36px;">
                                 <option value="">— Sélectionner —</option>
-                                <option value="1">Dr. Mehdi Alaoui — Cardiologie</option>
-                                <option value="2">Dr. Sara Tazi — Méd. Générale</option>
-                                <option value="3">Dr. Karim Fassi — Pédiatrie</option>
+                                @foreach($doctors as $doctor)
+                                <option value="{{ $doctor->id }}" {{ old('medecin_id') == $doctor->id ? 'selected' : '' }}>
+                                    Dr. {{ $doctor->prenom }} {{ $doctor->nom }}{{ $doctor->specialite ? ' — ' . $doctor->specialite : '' }}
+                                </option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
@@ -247,7 +254,7 @@
                     {{-- Status --}}
                     <div class="form-group" style="margin-bottom:0;">
                         <label class="form-label">Statut du dossier</label>
-                        <input type="hidden" name="status" id="status_input" value="actif">
+                        <input type="hidden" name="statut_dossier" id="status_input" value="actif">
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                             <button type="button" id="btn-actif" onclick="selectStatus('actif')" style="padding:10px;border-radius:10px;border:1.5px solid rgba(16,185,129,.4);background:rgba(16,185,129,.08);color:#059669;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;">
                                 <span style="width:8px;height:8px;border-radius:50%;background:#10b981;"></span> Actif
@@ -289,7 +296,7 @@
                     {{-- Insurance type pills --}}
                     <div class="form-group" style="margin-bottom:0;grid-column:1/-1;">
                         <label class="form-label">Type d'assurance</label>
-                        <input type="hidden" name="insurance" id="insurance_input" value="">
+                        <input type="hidden" name="assurance_type" id="insurance_input" value="">
                         <div style="display:flex;flex-wrap:wrap;gap:8px;">
                             @foreach(['Aucune','CNSS','CNOPS','FAR','Privée','Autre'] as $ins)
                             <button type="button" class="ins-btn" data-ins="{{ $ins }}" onclick="selectInsurance('{{ $ins }}')" style="padding:8px 16px;border-radius:10px;border:1.5px solid rgba(59,130,246,.2);background:#fff;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;">
@@ -304,7 +311,7 @@
                         <label class="form-label">N° police / adhérent</label>
                         <div style="position:relative;">
                             <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5"/></svg>
-                            <input type="text" class="form-control" name="insurance_number" placeholder="Numéro d'affiliation" style="padding-left:36px;">
+                            <input type="text" class="form-control" name="assurance_numero" placeholder="Numéro d'affiliation" style="padding-left:36px;">
                         </div>
                     </div>
 
@@ -320,7 +327,7 @@
                         <label class="form-label">Nom complet</label>
                         <div style="position:relative;">
                             <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0"/></svg>
-                            <input type="text" class="form-control" name="emergency_name" placeholder="Nom complet" style="padding-left:36px;">
+                            <input type="text" class="form-control" name="contact_urgence_nom" placeholder="Nom complet" style="padding-left:36px;">
                         </div>
                     </div>
 
@@ -329,7 +336,7 @@
                         <label class="form-label">Téléphone d'urgence</label>
                         <div style="position:relative;">
                             <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/></svg>
-                            <input type="tel" class="form-control" name="emergency_phone" placeholder="+212 6xx xxx xxx" style="padding-left:36px;">
+                            <input type="tel" class="form-control" name="contact_urgence_tel" placeholder="+212 6xx xxx xxx" style="padding-left:36px;">
                         </div>
                     </div>
 
@@ -343,7 +350,7 @@
                             </button>
                             @endforeach
                         </div>
-                        <input type="hidden" name="emergency_relation" id="relation_input" value="">
+                        <input type="hidden" name="lien_urgence" id="relation_input" value="">
                     </div>
                 </div>
                 <div style="padding:16px 24px;background:var(--teal-50);border-top:1px solid rgba(52,168,140,.1);display:flex;justify-content:space-between;">
@@ -583,8 +590,8 @@ function updateSteps() {
 
 /* ── Live preview ── */
 function updatePreview() {
-    const fn = document.getElementById('first_name').value.trim();
-    const ln = document.getElementById('last_name').value.trim();
+    const fn = document.getElementById('prenom').value.trim();
+    const ln = document.getElementById('nom').value.trim();
     const fullName = [fn, ln].filter(Boolean).join(' ');
     const initials = [fn[0], ln[0]].filter(Boolean).join('').toUpperCase() || '?';
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Patient;
+use App\Models\StaffMedical;
 use Illuminate\Http\Request;
 
 class PatientController extends Controller
@@ -21,15 +22,92 @@ class PatientController extends Controller
      */
     public function create()
     {
-        return view('patients.create');
+        $doctors = StaffMedical::whereIn('role', ['medecin', 'infirmier'])
+            ->orderBy('nom')
+            ->get();
+
+        return view('patients.create', compact('doctors'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        //
+    { 
+        $validated = $request->validate([
+
+            // Section 1 – Identity
+            'prenom'         => 'required|string|min:2|max:50',
+            'nom'            => 'required|string|min:2|max:50',
+            'cin'            => 'required|string|max:20|unique:patients,cin',
+            'date_naissance' => 'nullable|date|before:today',
+            'genre'          => 'nullable|in:M,F',
+            'groupe_sanguin' => 'nullable|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
+            'telephone'      => 'nullable|string|max:20',
+            'email'          => 'nullable|email|unique:patients,email',
+            'adresse'        => 'nullable|string|max:255',
+            'color'          => 'nullable|in:teal,blue,amber,rose,violet',
+
+            // Section 2 – Medical
+            'allergies'      => 'nullable|string|max:500',
+            'antecedents'    => 'nullable|string|max:2000',
+            'medecin_id'     => 'nullable|exists:staff_medicals,id',
+            'statut_dossier' => 'nullable|in:actif,inactif',
+
+            // Section 3 – Insurance & Emergency
+            'assurance_type'      => 'nullable|in:Aucune,CNSS,CNOPS,FAR,Privée,Autre',
+            'assurance_numero'    => 'nullable|string|max:50',
+            'contact_urgence_nom' => 'nullable|string|max:100',
+            'contact_urgence_tel' => 'nullable|string|max:20',
+            'lien_urgence'        => 'nullable|string|max:50',
+
+        ], [
+
+            // prenom / nom
+            'prenom.required' => 'Le prénom est obligatoire.',
+            'prenom.min'      => 'Minimum 2 caractères pour le prénom.',
+            'prenom.max'      => 'Maximum 50 caractères pour le prénom.',
+
+            'nom.required'    => 'Le nom est obligatoire.',
+            'nom.min'         => 'Minimum 2 caractères pour le nom.',
+            'nom.max'         => 'Maximum 50 caractères pour le nom.',
+
+            // cin
+            'cin.required'    => 'Le CIN / N° dossier est obligatoire.',
+            'cin.max'         => 'CIN trop long.',
+            'cin.unique'      => 'Ce CIN est déjà enregistré dans le système.',
+
+            // date / genre / groupe sanguin
+            'date_naissance.date'   => 'Date de naissance invalide.',
+            'date_naissance.before' => 'La date de naissance doit être dans le passé.',
+            'genre.in'              => 'Sexe invalide.',
+            'groupe_sanguin.in'     => 'Groupe sanguin invalide.',
+
+            // contact
+            'telephone.max'  => 'Numéro de téléphone trop long.',
+            'email.email'    => 'Format email invalide.',
+            'email.unique'   => 'Cet email est déjà utilisé.',
+            'adresse.max'    => 'Adresse trop longue.',
+
+            // medical
+            'allergies.max'      => 'Max 500 caractères pour les allergies.',
+            'antecedents.max'    => 'Max 2000 caractères pour les antécédents.',
+            'medecin_id.exists'  => 'Médecin invalide.',
+            'statut_dossier.in'  => 'Statut invalide.',
+
+            // insurance / emergency
+            'assurance_type.in'       => "Type d'assurance invalide.",
+            'assurance_numero.max'    => "Numéro d'assurance trop long.",
+            'contact_urgence_nom.max' => "Nom du contact d'urgence trop long.",
+            'contact_urgence_tel.max' => "Téléphone d'urgence trop long.",
+            'lien_urgence.max'        => 'Lien trop long.',
+        ]);
+
+        Patient::create($validated);
+
+        flash()->success('Patient ajouté avec succès.');
+
+        return redirect()->route('patients.index');
     }
 
     /**

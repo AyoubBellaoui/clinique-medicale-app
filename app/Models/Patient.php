@@ -40,6 +40,7 @@ class Patient extends Model
         'contact_urgence_nom',
         'contact_urgence_tel',
         'lien_urgence',
+        'color',
     ];
 
     public function medecin()

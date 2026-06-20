@@ -13,7 +13,6 @@ class StaffMedicalController extends Controller
     public function index()
     {
         $staff = StaffMedical::all();
-
         return view('staff.index', compact('staff'));
     }
 
@@ -43,7 +42,6 @@ class StaffMedicalController extends Controller
             'adresse'        => 'required|string|max:255',
             'color'          => 'required|in:teal,blue,amber,rose,violet',
 
-            // Section 2
             // Section 2
             'role'           => 'required|in:medecin,infirmier,secretaire,admin,technicien',
             'specialite'     => 'required_if:role,medecin,infirmier|nullable|string|max:100',
@@ -118,7 +116,7 @@ class StaffMedicalController extends Controller
             'degree.max'      => 'Diplôme trop long.',
 
             'school.required' => 'École obligatoire.',
-            'school.max'      => 'Nom de l’école trop long.',
+            'school.max'      => "Nom de l'école trop long.",
 
             'grad_year.required' => 'Année obligatoire.',
             'grad_year.integer'  => 'Doit être un nombre.',
@@ -132,7 +130,7 @@ class StaffMedicalController extends Controller
             'contract_type.required' => 'Type de contrat obligatoire.',
             'contract_type.in'       => 'Type invalide.',
 
-            'date_embauche.required' => 'Date d’embauche obligatoire.',
+            'date_embauche.required' => "Date d'embauche obligatoire.",
             'date_embauche.date'     => 'Date invalide.',
 
             'salaire.required' => 'Salaire obligatoire.',
