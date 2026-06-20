@@ -137,7 +137,7 @@
                         <div class="form-group" style="margin-bottom:0;">
                             <label class="form-label">Téléphone</label>
                             <div style="position:relative;">
-                                <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.338c0 .907.214 1.764.595 2.524M2.25 6.338C2.25 3.926 4.176 2 6.588 2c.37 0 .742.05 1.109.153m-5.447 4.185a11.28 11.28 0 001.69 4.073m0 0a11.31 11.31 0 006.303 4.476m0 0c.37.103.741.153 1.11.153 2.412 0 4.338-1.926 4.338-4.338 0-.907-.214-1.764-.596-2.524m-11.155 2.233l2.37 2.37m0 0l2.37 2.37m-2.37-2.37l-2.37 2.37" /></svg>
+                                <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg>
                                 <input type="tel" class="form-control pf-input @error('telephone') input-error @enderror" name="telephone" id="phone_field" placeholder="+212 6xx xxx xxx" value="{{ old('telephone') }}" oninput="updatePreview()" style="padding-left:36px;">
                             </div>
                             @error('telephone')<div class="field-error">{{ $message }}</div>@enderror
@@ -474,7 +474,7 @@
                             <span id="preview-email" style="color:var(--muted);">Email non renseigné</span>
                         </div>
                         <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;">
-                            <svg width="13" height="13" fill="none" stroke="var(--muted)" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.338c0 .907.214 1.764.595 2.524" /></svg>
+                            <svg width="13" height="13" fill="none" stroke="var(--muted)" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg>
                             <span id="preview-phone" style="color:var(--muted);">Téléphone non renseigné</span>
                         </div>
                         <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;">
