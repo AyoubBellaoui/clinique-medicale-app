@@ -53,7 +53,7 @@ class StaffMedical extends Model
 
     public function fileAttentes()
     {
-        return $this->hasMany(FileAttente::class, 'id_staff', 'id');
+        return $this->hasMany(FileAttente::class, 'staff_id', 'id');
     }
 
     /* ===================== ACCESSORS ===================== */

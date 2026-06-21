@@ -50,12 +50,12 @@ class Patient extends Model
 
     public function fileAttentes()
     {
-        return $this->hasMany(FileAttente::class, 'id_patient', 'id');
+        return $this->hasMany(FileAttente::class, 'patient_id', 'id');
     }
 
     public function consultations()
     {
-        return $this->hasMany(Consultation::class, 'id_patient', 'id');
+        return $this->hasMany(Consultation::class, 'patient_id', 'id');
     }
 
     public function getFullNameAttribute(): string
