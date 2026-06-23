@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Patient;
 use App\Models\StaffMedical;
+use App\Notifications\ClinicNotification;
 use Illuminate\Http\Request;
 
 class PatientController extends Controller
@@ -103,7 +104,12 @@ class PatientController extends Controller
             'lien_urgence.max'        => 'Lien trop long.',
         ]);
 
-        Patient::create($validated);
+        $patient = Patient::create($validated);
+
+        ClinicNotification::broadcast(
+            'patient', "Nouveau patient ajouté : {$patient->prenom} {$patient->nom}",
+            'patient', 'teal', route('patients.index')
+        );
 
         flash()->success('Patient ajouté avec succès.');
 
@@ -219,6 +225,11 @@ class PatientController extends Controller
         // instance ($p) you already fetched, not as a static method on the class.
         $p->update($validated);
 
+        ClinicNotification::broadcast(
+            'patient', "Dossier patient mis à jour : {$p->prenom} {$p->nom}",
+            'edit', 'blue', route('patients.index')
+        );
+
         flash()->success('Patient modifier avec succès.');
 
         return redirect()->route('patients.index');
@@ -230,7 +241,13 @@ class PatientController extends Controller
     public function destroy(string $id)
     {
         $p = Patient::findOrFail($id);
+        $name = $p->full_name;
         $p->delete();
+
+        ClinicNotification::broadcast(
+            'patient', "Patient supprimé : {$name}",
+            'delete', 'rose'
+        );
 
         flash()->success('Patient Supprime avec succès.');
 

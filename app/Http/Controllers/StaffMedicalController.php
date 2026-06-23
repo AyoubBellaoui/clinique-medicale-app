@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\StaffMedical;
+use App\Notifications\ClinicNotification;
 use Illuminate\Http\Request;
 
 class StaffMedicalController extends Controller
@@ -146,7 +147,12 @@ class StaffMedicalController extends Controller
             'notes.max' => 'Max 1000 caractères.',
         ]);
 
-        StaffMedical::create($validated);
+        $member = StaffMedical::create($validated);
+
+        ClinicNotification::broadcast(
+            'staff', "Nouveau membre ajouté : {$member->prenom} {$member->nom} ({$member->role})",
+            'staff', 'violet', route('staff.index')
+        );
 
         flash()->success('Membre du personnel ajouté avec succès.');
 
@@ -279,6 +285,11 @@ class StaffMedicalController extends Controller
 
         $s->update($validated);
 
+        ClinicNotification::broadcast(
+            'staff', "Profil mis à jour : {$s->prenom} {$s->nom}",
+            'edit', 'blue', route('staff.index')
+        );
+
         flash()->success('Membre du personnel mis à jour avec succès.');
 
         return redirect()->route('staff.index');
@@ -290,7 +301,13 @@ class StaffMedicalController extends Controller
     public function destroy(string $id)
     {
         $s = StaffMedical::findOrFail($id);
+        $name = $s->full_name;
         $s->delete();
+
+        ClinicNotification::broadcast(
+            'staff', "Membre supprimé : {$name}",
+            'delete', 'rose'
+        );
 
         flash()->success('Membre du personnel supprimé.');
 

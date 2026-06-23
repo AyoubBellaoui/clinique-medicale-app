@@ -11,6 +11,7 @@ use App\Http\Controllers\OrdonnancesController;
 use App\Http\Controllers\RendezVousController;
 use App\Http\Controllers\FacturesController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PatientsController;
 use App\Http\Controllers\SearchController;
 use App\Models\FileAttente;
@@ -85,6 +86,14 @@ Route::middleware('auth')->group(function () {
 
     // Mon Compte
     Route::get('/account', [AccountController::class, 'index'])->name('account.index');
+
+    // Notifications
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/count',    [NotificationController::class, 'unreadCount'])->name('count');
+        Route::get('/',         [NotificationController::class, 'index'])->name('index');
+        Route::post('/read-all',[NotificationController::class, 'markAllRead'])->name('readAll');
+        Route::post('/{id}/read',[NotificationController::class, 'markRead'])->name('read');
+    });
 
     // logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

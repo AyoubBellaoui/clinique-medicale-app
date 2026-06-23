@@ -536,32 +536,155 @@
             border-color: var(--teal-400);
         }
 
-        .header-notif::after {
-            content: '';
+        /* ─── Notification badge on bell ─── */
+        .notif-wrapper {
+            position: relative;
+        }
+
+        .notif-count {
             position: absolute;
-            top: 6px;
-            right: 6px;
-            width: 9px;
-            height: 9px;
+            top: -4px;
+            right: -4px;
+            min-width: 18px;
+            height: 18px;
             background: #ef4444;
-            border-radius: 50%;
+            color: #fff;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
             border: 2px solid #fff;
             animation: pulse 2s infinite;
+            pointer-events: none;
         }
+
+        .notif-count.hidden { display: none; }
 
         @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(239, 68, 68, .5);
-            }
-
-            70% {
-                box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-            }
+            0%  { box-shadow: 0 0 0 0 rgba(239,68,68,.5); }
+            70% { box-shadow: 0 0 0 7px rgba(239,68,68,0); }
+            100%{ box-shadow: 0 0 0 0 rgba(239,68,68,0); }
         }
+
+        /* ─── Notification panel ─── */
+        .notif-panel {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: 360px;
+            background: #fff;
+            border: 1px solid rgba(52,168,140,.15);
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(13,41,34,.15), 0 4px 12px rgba(13,41,34,.06);
+            z-index: 200;
+            overflow: hidden;
+            display: none;
+        }
+
+        .notif-panel.open { display: block; }
+
+        .notif-panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px 12px;
+            border-bottom: 1px solid rgba(52,168,140,.08);
+        }
+
+        .notif-panel-head h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--teal-800);
+        }
+
+        .notif-mark-all {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--teal-500);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 3px 8px;
+            border-radius: 6px;
+            transition: background .15s;
+        }
+
+        .notif-mark-all:hover { background: var(--teal-50); }
+
+        .notif-list-wrap {
+            max-height: 380px;
+            overflow-y: auto;
+        }
+
+        .notif-item {
+            display: flex;
+            gap: 12px;
+            padding: 13px 18px;
+            border-bottom: 1px solid rgba(52,168,140,.05);
+            cursor: pointer;
+            transition: background .15s;
+            text-decoration: none;
+        }
+
+        .notif-item:last-child { border-bottom: none; }
+        .notif-item:hover { background: var(--teal-50); }
+        .notif-item.unread { background: rgba(52,168,140,.04); }
+
+        .notif-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            margin-top: 5px;
+            flex-shrink: 0;
+        }
+
+        .notif-dot.teal   { background: var(--teal-400); }
+        .notif-dot.blue   { background: #3b82f6; }
+        .notif-dot.violet { background: #8b5cf6; }
+        .notif-dot.rose   { background: #f43f5e; }
+        .notif-dot.amber  { background: #f59e0b; }
+
+        .notif-item-body { flex: 1; min-width: 0; }
+
+        .notif-item-msg {
+            font-size: 13px;
+            color: var(--teal-800);
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .notif-item-time {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 3px;
+            font-weight: 500;
+        }
+
+        .notif-empty {
+            padding: 36px 20px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        /* dark mode */
+        html.dark .notif-panel {
+            background: #122230;
+            border-color: rgba(52,168,140,.15);
+            box-shadow: 0 20px 50px rgba(0,0,0,.4);
+        }
+
+        html.dark .notif-panel-head { border-bottom-color: rgba(52,168,140,.1); }
+        html.dark .notif-panel-head h4 { color: #cde8e2; }
+        html.dark .notif-count { border-color: #0d1b24; }
+        html.dark .notif-item:hover { background: rgba(52,168,140,.08); }
+        html.dark .notif-item.unread { background: rgba(52,168,140,.05); }
+        html.dark .notif-item-msg { color: #c8e6e0; }
+        html.dark .notif-mark-all { color: #2dd4bf; }
+        html.dark .notif-mark-all:hover { background: rgba(52,168,140,.1); }
 
         /* ─── Content ─── */
         .content {
@@ -2403,18 +2526,38 @@
                 </svg>
             </button>
 
-            <button class="header-btn header-notif" title="Notifications">
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
-                </svg>
-            </button>
+            {{-- ─── Notification Bell ─── --}}
+            <div class="notif-wrapper" id="notif-wrapper">
+                <button class="header-btn" id="notif-btn" title="Notifications">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+                    </svg>
+                    <span class="notif-count hidden" id="notif-count">0</span>
+                </button>
 
-            <button class="header-btn" title="Paramètres">
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-            </button>
+                <div class="notif-panel" id="notif-panel">
+                    <div class="notif-panel-head">
+                        <h4>Notifications</h4>
+                        <button class="notif-mark-all" id="notif-mark-all">Tout marquer lu</button>
+                    </div>
+                    <div class="notif-list-wrap">
+                        <div class="notif-list" id="notif-list">
+                            <div class="notif-empty">Chargement...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <a href="{{ route('account.index') }}">
+                <button class="header-btn" title="Paramètres">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </button>
+            </a>
+
+
         </header>
 
         {{-- Page content --}}
@@ -2517,6 +2660,115 @@
             const isDark = html.classList.toggle('dark');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
         });
+    </script>
+
+    {{-- ─── Notification System ─── --}}
+    <script>
+    (function () {
+        const ROUTES = {
+            count:   '{{ route('notifications.count') }}',
+            list:    '{{ route('notifications.index') }}',
+            readAll: '{{ route('notifications.readAll') }}',
+            read:    (id) => `/notifications/${id}/read`,
+        };
+
+        const CSRF = document.querySelector('meta[name="csrf-token"]').content;
+
+        const iconColors = {
+            teal:   '#34a88c',
+            blue:   '#3b82f6',
+            violet: '#8b5cf6',
+            rose:   '#f43f5e',
+            amber:  '#f59e0b',
+        };
+
+        const btn      = document.getElementById('notif-btn');
+        const panel    = document.getElementById('notif-panel');
+        const countEl  = document.getElementById('notif-count');
+        const listEl   = document.getElementById('notif-list');
+        const markAll  = document.getElementById('notif-mark-all');
+
+        // ── Fetch unread count and update badge ──
+        async function refreshCount() {
+            try {
+                const res  = await fetch(ROUTES.count);
+                const data = await res.json();
+                const n    = data.count;
+                countEl.textContent = n > 99 ? '99+' : n;
+                countEl.classList.toggle('hidden', n === 0);
+            } catch (_) {}
+        }
+
+        // ── Render notification list ──
+        async function loadNotifications() {
+            listEl.innerHTML = '<div class="notif-empty">Chargement...</div>';
+            try {
+                const res   = await fetch(ROUTES.list);
+                const items = await res.json();
+
+                if (!items.length) {
+                    listEl.innerHTML = '<div class="notif-empty">Aucune notification</div>';
+                    return;
+                }
+
+                listEl.innerHTML = items.map(n => {
+                    const color = n.data.color ?? 'teal';
+                    const url   = n.data.url ? `href="${n.data.url}"` : '';
+                    return `
+                    <a ${url} class="notif-item ${n.read ? '' : 'unread'}" data-id="${n.id}">
+                        <div class="notif-dot ${color}"></div>
+                        <div class="notif-item-body">
+                            <div class="notif-item-msg">${n.data.message}</div>
+                            <div class="notif-item-time">${n.time}</div>
+                        </div>
+                    </a>`;
+                }).join('');
+
+                // click a single item → mark as read
+                listEl.querySelectorAll('.notif-item[data-id]').forEach(el => {
+                    el.addEventListener('click', async () => {
+                        if (!el.classList.contains('unread')) return;
+                        await fetch(ROUTES.read(el.dataset.id), {
+                            method: 'POST',
+                            headers: { 'X-CSRF-TOKEN': CSRF, 'Content-Type': 'application/json' },
+                        });
+                        el.classList.remove('unread');
+                        refreshCount();
+                    });
+                });
+            } catch (_) {
+                listEl.innerHTML = '<div class="notif-empty">Erreur de chargement</div>';
+            }
+        }
+
+        // ── Toggle panel ──
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = panel.classList.toggle('open');
+            if (isOpen) loadNotifications();
+        });
+
+        // ── Close on outside click ──
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#notif-wrapper')) {
+                panel.classList.remove('open');
+            }
+        });
+
+        // ── Mark all read ──
+        markAll.addEventListener('click', async () => {
+            await fetch(ROUTES.readAll, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': CSRF, 'Content-Type': 'application/json' },
+            });
+            listEl.querySelectorAll('.notif-item').forEach(el => el.classList.remove('unread'));
+            countEl.classList.add('hidden');
+        });
+
+        // ── Poll every 30 seconds ──
+        refreshCount();
+        setInterval(refreshCount, 30000);
+    })();
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>

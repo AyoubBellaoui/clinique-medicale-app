@@ -17,7 +17,7 @@
             </svg>
         </div>
         <div class="stat-body">
-            <div class="stat-value">{{ $totalPatients ?? 0 }}</div>
+            <div class="stat-value">{{ \App\Models\Patient::count() }}</div>
             <div class="stat-label">Total Patients</div>
             <div class="stat-trend up">
                 ↑ {{ $newPatientsThisMonth ?? 0 }} ce mois
