@@ -23,8 +23,7 @@ Route::middleware('guest')->group(function () {
 });
 
 // Auth Routes
-Route::middleware('auth')->group(function () {
-
+Route::middleware('auth')->group(function () { 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'show_dashboard'])->name('dashboard.show');
 

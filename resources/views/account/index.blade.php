@@ -77,7 +77,7 @@
     <div>
         {{-- Tabs --}}
         <div style="display:flex;gap:4px;background:#fff;padding:5px;border-radius:12px;border:1px solid rgba(52,168,140,.1);box-shadow:var(--shadow);margin-bottom:18px;overflow-x:auto;" id="account-tabs">
-            @foreach([['profile','Profil','M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0'],['security','Sécurité','M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z'],['prefs','Préférences','M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827'],['notifs','Notifications','M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0']] as [$tab, $label, $icon])
+            @foreach([['profile','Profil','M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0'],['security','Sécurité','M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z'],['prefs','Préférences','M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75'],['notifs','Notifications','M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0']] as [$tab, $label, $icon])
             <button class="account-tab {{ $tab === 'profile' ? 'active' : '' }}" onclick="switchAccountTab('{{ $tab }}')" data-tab="{{ $tab }}">
                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $icon }}"/></svg>
                 {{ $label }}
@@ -120,9 +120,42 @@
                 </div>
                 <div style="padding:22px;">
                     <div class="form-grid">
-                        <div class="form-group full"><label class="form-label">Mot de passe actuel</label><input type="password" class="form-input" placeholder="••••••••"></div>
-                        <div class="form-group"><label class="form-label">Nouveau mot de passe</label><input type="password" class="form-input" placeholder="Min. 8 caractères"></div>
-                        <div class="form-group"><label class="form-label">Confirmer</label><input type="password" class="form-input" placeholder="Confirmer"></div>
+                        <div class="form-group full">
+                            <label class="form-label">Mot de passe actuel</label>
+                            <div style="position:relative;">
+                                <input type="password" class="form-input" placeholder="••••••••" style="width:100%;padding-right:38px;">
+                                <button type="button" class="account-toggle-pw" onclick="toggleAccountPw(this)" tabindex="-1">
+                                    <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nouveau mot de passe</label>
+                            <div style="position:relative;">
+                                <input type="password" class="form-input" placeholder="Min. 8 caractères" style="width:100%;padding-right:38px;">
+                                <button type="button" class="account-toggle-pw" onclick="toggleAccountPw(this)" tabindex="-1">
+                                    <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Confirmer</label>
+                            <div style="position:relative;">
+                                <input type="password" class="form-input" placeholder="Confirmer" style="width:100%;padding-right:38px;">
+                                <button type="button" class="account-toggle-pw" onclick="toggleAccountPw(this)" tabindex="-1">
+                                    <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     <div style="display:flex;justify-content:flex-end;margin-top:20px;">
                         <button class="btn btn-primary">Mettre à jour</button>
@@ -208,6 +241,10 @@
 .toggle-switch::after { content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.15);transition:transform .22s; }
 .toggle-switch.on { background:var(--teal-500); }
 .toggle-switch.on::after { transform:translateX(18px); }
+.account-toggle-pw { position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;padding:2px;display:flex;align-items:center;cursor:pointer;color:var(--muted); }
+.account-toggle-pw:hover { color:var(--teal-600); }
+html.dark .account-toggle-pw { color:#4d8a7e; }
+html.dark .account-toggle-pw:hover { color:#7ecab5; }
 </style>
 @endpush
 
@@ -216,6 +253,15 @@
 function switchAccountTab(tab) {
     document.querySelectorAll('.account-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
     document.querySelectorAll('.account-panel').forEach(p => p.classList.toggle('hidden', p.id !== 'panel-' + tab));
+}
+
+function toggleAccountPw(btn) {
+    const input = btn.previousElementSibling;
+    const showing = input.type === 'text';
+    input.type = showing ? 'password' : 'text';
+    btn.querySelector('svg').innerHTML = showing
+        ? '<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>'
+        : '<path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/>';
 }
 </script>
 @endpush

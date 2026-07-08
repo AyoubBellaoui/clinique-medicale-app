@@ -81,19 +81,6 @@
 
         .divider { height:1px; background:linear-gradient(90deg,transparent,rgba(52,168,140,.2),transparent); }
 
-        .forgot-link {
-            font-size:13px; font-weight:600; color:#34a88c;
-            text-decoration:none; position:relative; transition:color .2s;
-        }
-        .forgot-link::after {
-            content:''; position:absolute;
-            bottom:-1px; left:0; right:0; height:1px;
-            background:#34a88c; transform:scaleX(0);
-            transform-origin:left; transition:transform .2s ease;
-        }
-        .forgot-link:hover { color:#1a7260; }
-        .forgot-link:hover::after { transform:scaleX(1); }
-
         @keyframes floatA { 0%,100%{transform:translateY(0)}   50%{transform:translateY(-14px)} }
         @keyframes floatB { 0%,100%{transform:translateY(-8px)} 50%{transform:translateY(8px)}  }
         @keyframes slideUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
@@ -217,9 +204,6 @@
         html.dark .field-icon    { color: #4d8a7e; }
         html.dark .toggle-pw     { color: #4d8a7e; }
         html.dark .toggle-pw:hover { color: #7ecab5; }
-        html.dark .forgot-link   { color: #5eead4; }
-        html.dark .forgot-link:hover { color: #7ecab5; }
-        html.dark .forgot-link::after { background: #5eead4; }
         html.dark .divider {
             background: linear-gradient(90deg, transparent, rgba(52,168,140,.15), transparent);
         }
@@ -401,22 +385,12 @@
                     @enderror
                 </div>
 
-                {{-- Remember me + Forgot password --}}
-                <div class="su4" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;">
-
-                    {{-- Left: remember me --}}
-                    <div style="display:flex;align-items:center;gap:8px;">
-                        <input type="checkbox" id="remember_me" name="remember">
-                        <label for="remember_me" style="font-size:13px;color:#4a9080;cursor:pointer;user-select:none;font-weight:500;">
-                            Se souvenir de moi
-                        </label>
-                    </div>
-
-                    {{-- PasswordForget --}}
-                    <a href="" class="forgot-link">
-                        Mot de passe oublié ?
-                    </a>
-
+                {{-- Remember me --}}
+                <div class="su4" style="display:flex;align-items:center;margin-bottom:22px;">
+                    <input type="checkbox" id="remember_me" name="remember">
+                    <label for="remember_me" style="font-size:13px;color:#4a9080;cursor:pointer;user-select:none;font-weight:500;margin-left:8px;">
+                        Se souvenir de moi
+                    </label>
                 </div>
 
                 {{-- Divider --}}
