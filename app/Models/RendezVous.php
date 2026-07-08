@@ -12,6 +12,11 @@ class RendezVous extends Model
         'date',
         'heure',
         'statut',
+        'motif',
+        'type_consultation',
+        'duree',
+        'priorite',
+        'notes',
         'patient_id',
         'staff_id',
     ];
@@ -19,6 +24,7 @@ class RendezVous extends Model
     protected $casts = [
         'date' => 'date',
         'heure' => 'datetime:H:i',
+        'duree' => 'integer',
     ];
 
     public function patient()

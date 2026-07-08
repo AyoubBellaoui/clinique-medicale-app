@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Nouveau Rendez-vous')
-@section('page-title', 'Nouveau Rendez-vous')
-@section('page-subtitle', 'Planifier un rendez-vous patient')
+@section('title', 'Modifier le Rendez-vous')
+@section('page-title', 'Modifier le Rendez-vous')
+@section('page-subtitle', 'Mettre à jour un rendez-vous existant')
 
 @section('content')
 
@@ -12,8 +12,9 @@
     Retour aux rendez-vous
 </a>
 
-<form action="{{ route('appointments.store') }}" method="POST">
+<form action="{{ route('appointments.update', $appointment->id) }}" method="POST">
     @csrf
+    @method('PUT')
 
     {{-- Section 1: Patient & Doctor --}}
     <div class="card" style="margin-bottom:16px;overflow:hidden;">
@@ -34,7 +35,7 @@
                 <select class="form-control form-select @error('patient_id') input-error @enderror" name="patient_id">
                     <option value="">— Sélectionner un patient —</option>
                     @foreach($patients as $p)
-                        <option value="{{ $p->id }}" {{ old('patient_id') == $p->id ? 'selected' : '' }}>
+                        <option value="{{ $p->id }}" {{ old('patient_id', $appointment->patient_id) == $p->id ? 'selected' : '' }}>
                             {{ $p->full_name }} @if($p->cin) (CIN: {{ $p->cin }}) @endif
                         </option>
                     @endforeach
@@ -46,7 +47,7 @@
                 <select class="form-control form-select @error('staff_id') input-error @enderror" name="staff_id">
                     <option value="">— Sélectionner un médecin —</option>
                     @foreach($doctors as $d)
-                        <option value="{{ $d->id }}" {{ old('staff_id') == $d->id ? 'selected' : '' }}>
+                        <option value="{{ $d->id }}" {{ old('staff_id', $appointment->staff_id) == $d->id ? 'selected' : '' }}>
                             Dr. {{ $d->full_name }} @if($d->specialite) — {{ $d->specialite }} @endif
                         </option>
                     @endforeach
@@ -63,10 +64,24 @@
                         'controle_post_operatoire' => 'Contrôle post-opératoire',
                         'bilan_complet' => 'Bilan complet',
                     ] as $value => $label)
-                        <option value="{{ $value }}" {{ old('type_consultation') == $value ? 'selected' : '' }}>{{ $label }}</option>
+                        <option value="{{ $value }}" {{ old('type_consultation', $appointment->type_consultation) == $value ? 'selected' : '' }}>{{ $label }}</option>
                     @endforeach
                 </select>
                 @error('type_consultation')<div class="field-error">{{ $message }}</div>@enderror
+            </div>
+            <div class="form-group">
+                <label class="form-label">Statut <span style="color:#f43f5e;">*</span></label>
+                <select class="form-control form-select @error('statut') input-error @enderror" name="statut">
+                    @foreach([
+                        'programme' => 'Programmé',
+                        'confirme' => 'Confirmé',
+                        'termine' => 'Terminé',
+                        'annule' => 'Annulé',
+                    ] as $value => $label)
+                        <option value="{{ $value }}" {{ old('statut', $appointment->statut) == $value ? 'selected' : '' }}>{{ $label }}</option>
+                    @endforeach
+                </select>
+                @error('statut')<div class="field-error">{{ $message }}</div>@enderror
             </div>
         </div>
     </div>
@@ -80,7 +95,7 @@
             </div>
             <div>
                 <h3 style="font-size:15px;font-weight:700;color:var(--teal-800);margin:0;line-height:1.2;">Date & Heure</h3>
-                <span style="font-size:12px;color:var(--muted);font-weight:500;">Planifier le créneau du rendez-vous</span>
+                <span style="font-size:12px;color:var(--muted);font-weight:500;">Créneau du rendez-vous</span>
             </div>
         </div>
 
@@ -89,34 +104,22 @@
                 <label class="form-label">Date <span style="color:#f43f5e;">*</span></label>
                 <div style="position:relative;">
                     <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
-                    <input datepicker datepicker-autohide datepicker-format="yyyy-mm-dd" type="text" class="form-control @error('date') input-error @enderror" name="date" value="{{ old('date') }}" placeholder="aaaa-mm-jj" autocomplete="off" style="padding-left:36px;">
+                    <input datepicker datepicker-autohide datepicker-format="yyyy-mm-dd" type="text" class="form-control @error('date') input-error @enderror" name="date" value="{{ old('date', $appointment->date->format('Y-m-d')) }}" placeholder="aaaa-mm-jj" autocomplete="off" style="padding-left:36px;">
                 </div>
                 @error('date')<div class="field-error">{{ $message }}</div>@enderror
             </div>
             <div class="form-group">
                 <label class="form-label">Heure de début <span style="color:#f43f5e;">*</span></label>
-                <input type="time" class="form-control @error('heure') input-error @enderror" name="heure" value="{{ old('heure', '09:00') }}">
+                <input type="time" class="form-control @error('heure') input-error @enderror" name="heure" value="{{ old('heure', $appointment->heure->format('H:i')) }}">
                 @error('heure')<div class="field-error">{{ $message }}</div>@enderror
             </div>
             <div class="form-group">
                 <label class="form-label">Durée estimée</label>
                 <select class="form-control form-select" name="duree">
                     @foreach([15 => '15 min', 30 => '30 min', 45 => '45 min', 60 => '1 heure', 90 => '1h30'] as $minutes => $label)
-                        <option value="{{ $minutes }}" {{ old('duree', 30) == $minutes ? 'selected' : '' }}>{{ $label }}</option>
+                        <option value="{{ $minutes }}" {{ old('duree', $appointment->duree) == $minutes ? 'selected' : '' }}>{{ $label }}</option>
                     @endforeach
                 </select>
-            </div>
-        </div>
-
-        {{-- Time slots --}}
-        <div style="padding:0 24px 24px;">
-            <label class="form-label" style="margin-bottom:10px;">Créneaux suggérés</label>
-            <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                @foreach(['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','14:00','14:30','15:00','15:30','16:00','16:30'] as $slot)
-                <button type="button" class="slot-btn" onclick="selectSlot(this, '{{ $slot }}')">
-                    {{ $slot }}
-                </button>
-                @endforeach
             </div>
         </div>
     </div>
@@ -137,21 +140,21 @@
         <div style="padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:18px;">
             <div class="form-group">
                 <label class="form-label">Motif de consultation</label>
-                <input type="text" class="form-control @error('motif') input-error @enderror" name="motif" value="{{ old('motif') }}" placeholder="Ex: Douleurs thoraciques, suivi tension…">
+                <input type="text" class="form-control @error('motif') input-error @enderror" name="motif" value="{{ old('motif', $appointment->motif) }}" placeholder="Ex: Douleurs thoraciques, suivi tension…">
                 @error('motif')<div class="field-error">{{ $message }}</div>@enderror
             </div>
             <div class="form-group">
                 <label class="form-label">Priorité <span style="color:#f43f5e;">*</span></label>
                 <select class="form-control form-select @error('priorite') input-error @enderror" name="priorite">
-                    <option value="normale" {{ old('priorite', 'normale') == 'normale' ? 'selected' : '' }}>Normale</option>
-                    <option value="haute" {{ old('priorite') == 'haute' ? 'selected' : '' }}>Haute</option>
-                    <option value="urgente" {{ old('priorite') == 'urgente' ? 'selected' : '' }}>Urgente</option>
+                    <option value="normale" {{ old('priorite', $appointment->priorite) == 'normale' ? 'selected' : '' }}>Normale</option>
+                    <option value="haute" {{ old('priorite', $appointment->priorite) == 'haute' ? 'selected' : '' }}>Haute</option>
+                    <option value="urgente" {{ old('priorite', $appointment->priorite) == 'urgente' ? 'selected' : '' }}>Urgente</option>
                 </select>
                 @error('priorite')<div class="field-error">{{ $message }}</div>@enderror
             </div>
             <div class="form-group" style="grid-column:1/-1;">
                 <label class="form-label">Notes additionnelles</label>
-                <textarea class="form-control @error('notes') input-error @enderror" name="notes" rows="3" placeholder="Informations complémentaires pour le médecin…">{{ old('notes') }}</textarea>
+                <textarea class="form-control @error('notes') input-error @enderror" name="notes" rows="3" placeholder="Informations complémentaires pour le médecin…">{{ old('notes', $appointment->notes) }}</textarea>
                 @error('notes')<div class="field-error">{{ $message }}</div>@enderror
             </div>
         </div>
@@ -159,8 +162,8 @@
         <div style="padding:16px 24px;background:var(--teal-50);border-top:1px solid rgba(52,168,140,.1);display:flex;justify-content:flex-end;gap:10px;">
             <a href="{{ route('appointments.index') }}" class="btn btn-outline">Annuler</a>
             <button type="submit" class="btn btn-primary">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-                Créer le rendez-vous
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Enregistrer les modifications
             </button>
         </div>
     </div>
@@ -184,18 +187,5 @@
 select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237bbfb0' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:36px;cursor:pointer;}
 textarea.form-control{resize:vertical;min-height:80px;line-height:1.65;}
 .form-label{font-size:11px;font-weight:700;color:var(--teal-600);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:5px;}
-.slot-btn{padding:6px 14px;border-radius:8px;font-size:12.5px;font-weight:600;border:1.5px solid rgba(52,168,140,.3);background:rgba(52,168,140,.06);color:var(--teal-700);cursor:pointer;transition:all .15s;font-family:'Plus Jakarta Sans',sans-serif;}
-.slot-btn:hover:not(:disabled){background:var(--teal-500);border-color:var(--teal-500);color:#fff;}
-.slot-btn.slot-active{background:var(--teal-500);border-color:var(--teal-500);color:#fff;}
 </style>
-@endpush
-
-@push('scripts')
-<script>
-function selectSlot(btn, time) {
-    document.querySelectorAll('.slot-active').forEach(b => b.classList.remove('slot-active'));
-    btn.classList.add('slot-active');
-    document.querySelector('[name="heure"]').value = time;
-}
-</script>
 @endpush
