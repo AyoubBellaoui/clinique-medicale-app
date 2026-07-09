@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Nouvelle Facture')
-@section('page-title', 'Nouvelle Facture')
-@section('page-subtitle', 'Créer une facture patient')
+@section('title', 'Modifier la Facture')
+@section('page-title', 'Modifier la Facture')
+@section('page-subtitle', 'Mettre à jour une facture existante')
 
 @section('content')
 
@@ -12,8 +12,9 @@
     Retour aux factures
 </a>
 
-<form action="{{ route('billing.store') }}" method="POST" id="invoiceForm">
+<form action="{{ route('billing.update', $facture->id) }}" method="POST" id="invoiceForm">
     @csrf
+    @method('PUT')
 
     {{-- Billing info --}}
     <div class="card" style="margin-bottom:16px;overflow:hidden;">
@@ -28,7 +29,7 @@
                     <span style="font-size:12px;color:var(--muted);font-weight:500;">Patient, médecin et modalités de paiement</span>
                 </div>
             </div>
-            <div style="font-size:13px;color:var(--muted);">N° <strong style="color:var(--teal-700);font-variant-numeric:tabular-nums;">{{ $nextNumero }}</strong></div>
+            <div style="font-size:13px;color:var(--muted);">N° <strong style="color:var(--teal-700);font-variant-numeric:tabular-nums;">{{ $facture->numero }}</strong></div>
         </div>
 
         <div style="padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:18px;">
@@ -37,7 +38,7 @@
                 <select class="form-control form-select" name="consultation_id" id="consultation_select" onchange="applyConsultation()">
                     <option value="">— Optionnel —</option>
                     @foreach($consultations as $consult)
-                        <option value="{{ $consult->id }}" data-patient="{{ $consult->patient_id }}" data-staff="{{ $consult->staff_id }}" {{ old('consultation_id') == $consult->id ? 'selected' : '' }}>
+                        <option value="{{ $consult->id }}" data-patient="{{ $consult->patient_id }}" data-staff="{{ $consult->staff_id }}" {{ old('consultation_id', $facture->consultation_id) == $consult->id ? 'selected' : '' }}>
                             Consultation du {{ $consult->date_consultation->format('d/m/Y') }} — {{ $consult->patient->full_name ?? '—' }}
                         </option>
                     @endforeach
@@ -45,13 +46,10 @@
                 @error('consultation_id')<div class="field-error">{{ $message }}</div>@enderror
             </div>
             <div class="form-group">
-                <label class="form-label">Mode de paiement</label>
-                <select class="form-control form-select" name="payment_method">
-                    <option value="especes" {{ old('payment_method', 'especes') == 'especes' ? 'selected' : '' }}>Espèces</option>
-                    <option value="carte" {{ old('payment_method') == 'carte' ? 'selected' : '' }}>Carte bancaire</option>
-                    <option value="cheque" {{ old('payment_method') == 'cheque' ? 'selected' : '' }}>Chèque</option>
-                    <option value="virement" {{ old('payment_method') == 'virement' ? 'selected' : '' }}>Virement</option>
-                    <option value="assurance" {{ old('payment_method') == 'assurance' ? 'selected' : '' }}>Assurance</option>
+                <label class="form-label">Statut <span style="color:#f43f5e;">*</span></label>
+                <select class="form-control form-select" name="statut">
+                    <option value="en_attente" {{ old('statut', $facture->statut) == 'en_attente' ? 'selected' : '' }}>En attente</option>
+                    <option value="paye" {{ old('statut', $facture->statut) == 'paye' ? 'selected' : '' }}>Payé</option>
                 </select>
             </div>
             <div class="form-group">
@@ -59,7 +57,7 @@
                 <select class="form-control form-select @error('patient_id') input-error @enderror" name="patient_id" id="patient_select" onchange="onPatientChange()">
                     <option value="">— Sélectionner un patient —</option>
                     @foreach($patients as $p)
-                        <option value="{{ $p->id }}" data-medecin="{{ $p->medecin_id }}" {{ old('patient_id') == $p->id ? 'selected' : '' }}>
+                        <option value="{{ $p->id }}" data-medecin="{{ $p->medecin_id }}" {{ old('patient_id', $facture->patient_id) == $p->id ? 'selected' : '' }}>
                             {{ $p->full_name }} @if($p->cin) (CIN: {{ $p->cin }}) @endif
                         </option>
                     @endforeach
@@ -71,7 +69,7 @@
                 <select class="form-control form-select @error('staff_id') input-error @enderror" name="staff_id" id="doctor_select">
                     <option value="">— Sélectionner —</option>
                     @foreach($doctors as $d)
-                        <option value="{{ $d->id }}" {{ old('staff_id') == $d->id ? 'selected' : '' }}>
+                        <option value="{{ $d->id }}" {{ old('staff_id', $facture->staff_id) == $d->id ? 'selected' : '' }}>
                             Dr. {{ $d->full_name }} @if($d->specialite) — {{ $d->specialite }} @endif
                         </option>
                     @endforeach
@@ -82,7 +80,7 @@
                 <label class="form-label">Date de facturation</label>
                 <div style="position:relative;">
                     <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
-                    <input datepicker datepicker-autohide datepicker-format="yyyy-mm-dd" type="text" class="form-control @error('date') input-error @enderror" name="date" value="{{ old('date', today()->format('Y-m-d')) }}" placeholder="aaaa-mm-jj" autocomplete="off" style="padding-left:36px;">
+                    <input datepicker datepicker-autohide datepicker-format="yyyy-mm-dd" type="text" class="form-control @error('date') input-error @enderror" name="date" value="{{ old('date', $facture->date_facturation->format('Y-m-d')) }}" placeholder="aaaa-mm-jj" autocomplete="off" style="padding-left:36px;">
                 </div>
                 @error('date')<div class="field-error">{{ $message }}</div>@enderror
             </div>
@@ -90,9 +88,19 @@
                 <label class="form-label">Date d'échéance</label>
                 <div style="position:relative;">
                     <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
-                    <input datepicker datepicker-autohide datepicker-format="yyyy-mm-dd" type="text" class="form-control @error('due_date') input-error @enderror" name="due_date" value="{{ old('due_date') }}" placeholder="aaaa-mm-jj" autocomplete="off" style="padding-left:36px;">
+                    <input datepicker datepicker-autohide datepicker-format="yyyy-mm-dd" type="text" class="form-control @error('due_date') input-error @enderror" name="due_date" value="{{ old('due_date', optional($facture->date_echeance)->format('Y-m-d')) }}" placeholder="aaaa-mm-jj" autocomplete="off" style="padding-left:36px;">
                 </div>
                 @error('due_date')<div class="field-error">{{ $message }}</div>@enderror
+            </div>
+            <div class="form-group">
+                <label class="form-label">Mode de paiement</label>
+                <select class="form-control form-select" name="payment_method">
+                    <option value="especes" {{ old('payment_method', $facture->mode_paiement) == 'especes' ? 'selected' : '' }}>Espèces</option>
+                    <option value="carte" {{ old('payment_method', $facture->mode_paiement) == 'carte' ? 'selected' : '' }}>Carte bancaire</option>
+                    <option value="cheque" {{ old('payment_method', $facture->mode_paiement) == 'cheque' ? 'selected' : '' }}>Chèque</option>
+                    <option value="virement" {{ old('payment_method', $facture->mode_paiement) == 'virement' ? 'selected' : '' }}>Virement</option>
+                    <option value="assurance" {{ old('payment_method', $facture->mode_paiement) == 'assurance' ? 'selected' : '' }}>Assurance</option>
+                </select>
             </div>
         </div>
     </div>
@@ -107,7 +115,7 @@
                 </div>
                 <div>
                     <h3 style="font-size:15px;font-weight:700;color:var(--teal-800);margin:0;line-height:1.2;">Prestations</h3>
-                    <span id="service-count" style="font-size:12px;color:var(--muted);font-weight:500;">1 prestation</span>
+                    <span id="service-count" style="font-size:12px;color:var(--muted);font-weight:500;">{{ $facture->lignes->count() ?: 1 }} prestation{{ $facture->lignes->count() > 1 ? 's' : '' }}</span>
                 </div>
             </div>
             <button type="button" class="btn btn-outline btn-sm" onclick="addServiceRow()">
@@ -127,18 +135,19 @@
                 <div></div>
             </div>
             <div id="service-rows">
+                @forelse($facture->lignes as $i => $ligne)
                 <div class="svc-row" style="display:grid;grid-template-columns:3fr 1fr 1.2fr 1.2fr auto;gap:12px;align-items:center;margin-bottom:10px;">
-                    <select class="form-control form-select" name="services[0][name]" onchange="updateTotal(this)">
-                        <option value="">— Choisir une prestation —</option>
-                        <option data-price="300">Consultation standard — 300 MAD</option>
-                        <option data-price="500">Consultation spécialisée — 500 MAD</option>
-                        <option data-price="150">Bilan biologique — 150 MAD</option>
-                        <option data-price="800">Scanner / IRM — 800 MAD</option>
-                        <option data-price="200">Radiographie — 200 MAD</option>
-                        <option data-price="100">Électrocardiogramme — 100 MAD</option>
-                        <option data-price="250">Acte chirurgical mineur — 250 MAD</option>
-                        <option data-price="0">Autre (saisie manuelle)</option>
-                    </select>
+                    <input type="text" class="form-control" name="services[{{ $i }}][name]" value="{{ old("services.$i.name", $ligne->designation) }}" placeholder="Désignation de la prestation">
+                    <input type="number" class="form-control" name="services[{{ $i }}][qty]" value="{{ old("services.$i.qty", $ligne->quantite) }}" min="1" onchange="recalcRow(this)" style="text-align:center;">
+                    <input type="number" class="form-control" name="services[{{ $i }}][price]" value="{{ old("services.$i.price", $ligne->prix_unitaire) }}" min="0" onchange="recalcRow(this)" style="font-variant-numeric:tabular-nums;">
+                    <div class="svc-total" style="font-weight:700;color:var(--teal-800);font-variant-numeric:tabular-nums;font-size:14px;padding:0 4px;">0 MAD</div>
+                    <button type="button" class="btn btn-ghost btn-sm btn-icon-only" onclick="removeServiceRow(this)" style="color:#f43f5e;">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                @empty
+                <div class="svc-row" style="display:grid;grid-template-columns:3fr 1fr 1.2fr 1.2fr auto;gap:12px;align-items:center;margin-bottom:10px;">
+                    <input type="text" class="form-control" name="services[0][name]" placeholder="Désignation de la prestation">
                     <input type="number" class="form-control" name="services[0][qty]" value="1" min="1" onchange="recalcRow(this)" style="text-align:center;">
                     <input type="number" class="form-control" name="services[0][price]" placeholder="0" min="0" onchange="recalcRow(this)" style="font-variant-numeric:tabular-nums;">
                     <div class="svc-total" style="font-weight:700;color:var(--teal-800);font-variant-numeric:tabular-nums;font-size:14px;padding:0 4px;">0 MAD</div>
@@ -146,6 +155,7 @@
                         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
+                @endforelse
             </div>
         </div>
 
@@ -158,15 +168,15 @@
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:13.5px;">
                     <span style="color:var(--muted);">Remise (%)</span>
-                    <input type="number" class="form-control" name="discount" id="discount" value="{{ old('discount', 0) }}" min="0" max="100" style="width:80px;text-align:center;" onchange="updateGrandTotal()">
+                    <input type="number" class="form-control" name="discount" id="discount" value="{{ old('discount', $facture->remise) }}" min="0" max="100" style="width:80px;text-align:center;" onchange="updateGrandTotal()">
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:13.5px;">
                     <span style="color:var(--muted);">TVA (%)</span>
                     <select class="form-control form-select" name="tax" id="tax" style="width:100px;" onchange="updateGrandTotal()">
-                        <option value="0" {{ old('tax', 0) == 0 ? 'selected' : '' }}>0%</option>
-                        <option value="7" {{ old('tax') == 7 ? 'selected' : '' }}>7%</option>
-                        <option value="10" {{ old('tax') == 10 ? 'selected' : '' }}>10%</option>
-                        <option value="20" {{ old('tax') == 20 ? 'selected' : '' }}>20%</option>
+                        <option value="0" {{ old('tax', $facture->tva) == 0 ? 'selected' : '' }}>0%</option>
+                        <option value="7" {{ old('tax', $facture->tva) == 7 ? 'selected' : '' }}>7%</option>
+                        <option value="10" {{ old('tax', $facture->tva) == 10 ? 'selected' : '' }}>10%</option>
+                        <option value="20" {{ old('tax', $facture->tva) == 20 ? 'selected' : '' }}>20%</option>
                     </select>
                 </div>
                 <div style="display:flex;justify-content:space-between;padding:12px;border-radius:10px;background:linear-gradient(135deg,rgba(52,168,140,.1),rgba(52,168,140,.05));border:1px solid rgba(52,168,140,.2);">
@@ -194,21 +204,21 @@
             <div class="form-group">
                 <label class="form-label">Couverture assurance</label>
                 <select class="form-control form-select" name="insurance">
-                    <option value="" {{ old('insurance') == '' ? 'selected' : '' }}>Aucune (paiement direct)</option>
-                    <option {{ old('insurance') == 'CNSS' ? 'selected' : '' }}>CNSS</option>
-                    <option {{ old('insurance') == 'CNOPS' ? 'selected' : '' }}>CNOPS</option>
-                    <option {{ old('insurance') == 'FAR' ? 'selected' : '' }}>FAR</option>
-                    <option {{ old('insurance') == 'Assurance privée' ? 'selected' : '' }}>Assurance privée</option>
+                    <option value="" {{ old('insurance', $facture->assurance) == '' ? 'selected' : '' }}>Aucune (paiement direct)</option>
+                    <option {{ old('insurance', $facture->assurance) == 'CNSS' ? 'selected' : '' }}>CNSS</option>
+                    <option {{ old('insurance', $facture->assurance) == 'CNOPS' ? 'selected' : '' }}>CNOPS</option>
+                    <option {{ old('insurance', $facture->assurance) == 'FAR' ? 'selected' : '' }}>FAR</option>
+                    <option {{ old('insurance', $facture->assurance) == 'Assurance privée' ? 'selected' : '' }}>Assurance privée</option>
                 </select>
             </div>
             <div class="form-group">
                 <label class="form-label">Taux de remboursement (%)</label>
-                <input type="number" class="form-control @error('coverage_rate') input-error @enderror" name="coverage_rate" value="{{ old('coverage_rate') }}" placeholder="Ex: 70" min="0" max="100">
+                <input type="number" class="form-control @error('coverage_rate') input-error @enderror" name="coverage_rate" value="{{ old('coverage_rate', $facture->taux_remboursement) }}" placeholder="Ex: 70" min="0" max="100">
                 @error('coverage_rate')<div class="field-error">{{ $message }}</div>@enderror
             </div>
             <div class="form-group" style="grid-column:1/-1;">
                 <label class="form-label">Notes / Observations</label>
-                <textarea class="form-control @error('notes') input-error @enderror" name="notes" rows="2" placeholder="Informations complémentaires…">{{ old('notes') }}</textarea>
+                <textarea class="form-control @error('notes') input-error @enderror" name="notes" rows="2" placeholder="Informations complémentaires…">{{ old('notes', $facture->notes) }}</textarea>
                 @error('notes')<div class="field-error">{{ $message }}</div>@enderror
             </div>
         </div>
@@ -216,8 +226,8 @@
         <div style="padding:16px 24px;background:var(--teal-50);border-top:1px solid rgba(52,168,140,.1);display:flex;justify-content:flex-end;gap:10px;">
             <a href="{{ route('billing.index') }}" class="btn btn-outline">Annuler</a>
             <button type="submit" class="btn btn-primary">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-                Émettre la facture
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Enregistrer les modifications
             </button>
         </div>
     </div>
@@ -246,18 +256,9 @@ textarea.form-control{resize:vertical;min-height:80px;line-height:1.65;}
 
 @push('scripts')
 <script>
-let svcIndex = 1;
+let svcIndex = {{ max($facture->lignes->count(), 1) }};
 
 function fmt(n) { return n.toLocaleString('fr-FR') + ' MAD'; }
-
-function updateTotal(sel) {
-    const opt = sel.options[sel.selectedIndex];
-    const price = parseFloat(opt.getAttribute('data-price') || 0);
-    const row = sel.closest('.svc-row');
-    const priceInput = row.querySelector('[name$="[price]"]');
-    if (price > 0) priceInput.value = price;
-    recalcRow(priceInput);
-}
 
 function recalcRow(input) {
     const row = input.closest('.svc-row');
@@ -288,17 +289,7 @@ function addServiceRow() {
     row.className = 'svc-row';
     row.style.cssText = 'display:grid;grid-template-columns:3fr 1fr 1.2fr 1.2fr auto;gap:12px;align-items:center;margin-bottom:10px;';
     row.innerHTML = `
-        <select class="form-control form-select" name="services[${i}][name]" onchange="updateTotal(this)">
-            <option value="">— Choisir une prestation —</option>
-            <option data-price="300">Consultation standard — 300 MAD</option>
-            <option data-price="500">Consultation spécialisée — 500 MAD</option>
-            <option data-price="150">Bilan biologique — 150 MAD</option>
-            <option data-price="800">Scanner / IRM — 800 MAD</option>
-            <option data-price="200">Radiographie — 200 MAD</option>
-            <option data-price="100">Électrocardiogramme — 100 MAD</option>
-            <option data-price="250">Acte chirurgical mineur — 250 MAD</option>
-            <option data-price="0">Autre (saisie manuelle)</option>
-        </select>
+        <input type="text" class="form-control" name="services[${i}][name]" placeholder="Désignation de la prestation">
         <input type="number" class="form-control" name="services[${i}][qty]" value="1" min="1" onchange="recalcRow(this)" style="text-align:center;">
         <input type="number" class="form-control" name="services[${i}][price]" placeholder="0" min="0" onchange="recalcRow(this)" style="font-variant-numeric:tabular-nums;">
         <div class="svc-total" style="font-weight:700;color:var(--teal-800);font-variant-numeric:tabular-nums;font-size:14px;padding:0 4px;">0 MAD</div>
@@ -344,5 +335,9 @@ function applyConsultation() {
         document.getElementById('doctor_select').value = opt.dataset.staff;
     }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.svc-row').forEach(row => recalcRow(row.querySelector('[name$="[qty]"]')));
+});
 </script>
 @endpush

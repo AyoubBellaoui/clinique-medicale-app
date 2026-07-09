@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Nouvelle Ordonnance')
-@section('page-title', 'Nouvelle Ordonnance')
-@section('page-subtitle', 'Rédiger une ordonnance médicale')
+@section('title', "Modifier l'Ordonnance")
+@section('page-title', "Modifier l'Ordonnance")
+@section('page-subtitle', 'Mettre à jour une ordonnance existante')
 
 @section('content')
 
@@ -12,8 +12,9 @@
     Retour aux ordonnances
 </a>
 
-<form action="{{ route('prescriptions.store') }}" method="POST" id="rxForm">
+<form action="{{ route('prescriptions.update', $ordonnance->id) }}" method="POST" id="rxForm">
     @csrf
+    @method('PUT')
 
     {{-- Header info --}}
     <div class="card" style="margin-bottom:16px;overflow:hidden;">
@@ -34,7 +35,7 @@
                 <select class="form-control form-select" name="consultation_id" id="consultation_select" onchange="applyConsultation()">
                     <option value="">— Optionnel —</option>
                     @foreach($consultations as $consult)
-                        <option value="{{ $consult->id }}" data-patient="{{ $consult->patient_id }}" data-staff="{{ $consult->staff_id }}" data-diagnostic="{{ $consult->diagnostic }}" {{ old('consultation_id') == $consult->id ? 'selected' : '' }}>
+                        <option value="{{ $consult->id }}" data-patient="{{ $consult->patient_id }}" data-staff="{{ $consult->staff_id }}" data-diagnostic="{{ $consult->diagnostic }}" {{ old('consultation_id', $ordonnance->consultation_id) == $consult->id ? 'selected' : '' }}>
                             Consultation du {{ $consult->date_consultation->format('d/m/Y') }} — {{ $consult->patient->full_name ?? '—' }}
                         </option>
                     @endforeach
@@ -43,7 +44,7 @@
             </div>
             <div class="form-group">
                 <label class="form-label">Diagnostic associé</label>
-                <input type="text" class="form-control @error('diagnostic_associe') input-error @enderror" name="diagnostic_associe" id="diagnostic_associe" value="{{ old('diagnostic_associe') }}" placeholder="Ex: Hypertension artérielle, grippe…">
+                <input type="text" class="form-control @error('diagnostic_associe') input-error @enderror" name="diagnostic_associe" id="diagnostic_associe" value="{{ old('diagnostic_associe', $ordonnance->diagnostic_associe) }}" placeholder="Ex: Hypertension artérielle, grippe…">
                 @error('diagnostic_associe')<div class="field-error">{{ $message }}</div>@enderror
             </div>
             <div class="form-group">
@@ -51,7 +52,7 @@
                 <select class="form-control form-select @error('patient_id') input-error @enderror" name="patient_id" id="patient_select" onchange="onPatientChange()">
                     <option value="">— Sélectionner un patient —</option>
                     @foreach($patients as $p)
-                        <option value="{{ $p->id }}" data-medecin="{{ $p->medecin_id }}" {{ old('patient_id') == $p->id ? 'selected' : '' }}>
+                        <option value="{{ $p->id }}" data-medecin="{{ $p->medecin_id }}" {{ old('patient_id', $ordonnance->patient_id) == $p->id ? 'selected' : '' }}>
                             {{ $p->full_name }} @if($p->cin) (CIN: {{ $p->cin }}) @endif
                         </option>
                     @endforeach
@@ -63,7 +64,7 @@
                 <select class="form-control form-select @error('staff_id') input-error @enderror" name="staff_id" id="doctor_select">
                     <option value="">— Sélectionner —</option>
                     @foreach($doctors as $d)
-                        <option value="{{ $d->id }}" {{ old('staff_id') == $d->id ? 'selected' : '' }}>
+                        <option value="{{ $d->id }}" {{ old('staff_id', $ordonnance->staff_id) == $d->id ? 'selected' : '' }}>
                             Dr. {{ $d->full_name }} @if($d->specialite) — {{ $d->specialite }} @endif
                         </option>
                     @endforeach
@@ -74,7 +75,7 @@
                 <label class="form-label">Date <span style="color:#f43f5e;">*</span></label>
                 <div style="position:relative;">
                     <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
-                    <input datepicker datepicker-autohide datepicker-format="yyyy-mm-dd" type="text" class="form-control @error('date') input-error @enderror" name="date" value="{{ old('date', today()->format('Y-m-d')) }}" placeholder="aaaa-mm-jj" autocomplete="off" style="padding-left:36px;">
+                    <input datepicker datepicker-autohide datepicker-format="yyyy-mm-dd" type="text" class="form-control @error('date') input-error @enderror" name="date" value="{{ old('date', $ordonnance->date_prescription->format('Y-m-d')) }}" placeholder="aaaa-mm-jj" autocomplete="off" style="padding-left:36px;">
                 </div>
                 @error('date')<div class="field-error">{{ $message }}</div>@enderror
             </div>
@@ -82,7 +83,7 @@
                 <label class="form-label">Durée de validité</label>
                 <select class="form-control form-select" name="duree_validite">
                     @foreach(['5 jours','7 jours','10 jours','15 jours','1 mois','3 mois','6 mois','1 an'] as $opt)
-                        <option value="{{ $opt }}" {{ old('duree_validite') == $opt ? 'selected' : '' }}>{{ $opt }}</option>
+                        <option value="{{ $opt }}" {{ old('duree_validite', $ordonnance->duree_validite) == $opt ? 'selected' : '' }}>{{ $opt }}</option>
                     @endforeach
                 </select>
             </div>
@@ -99,7 +100,7 @@
                 </div>
                 <div>
                     <h3 style="font-size:15px;font-weight:700;color:var(--teal-800);margin:0;line-height:1.2;">Médicaments</h3>
-                    <span id="med-count" style="font-size:12px;color:var(--muted);font-weight:500;">1 médicament</span>
+                    <span id="med-count" style="font-size:12px;color:var(--muted);font-weight:500;">{{ $ordonnance->medicaments->count() ?: 1 }} médicament{{ $ordonnance->medicaments->count() > 1 ? 's' : '' }}</span>
                 </div>
             </div>
             <button type="button" class="btn btn-outline btn-sm" onclick="addMedRow()">
@@ -111,18 +112,19 @@
         @error('meds')<div class="field-error" style="padding:12px 24px 0;">{{ $message }}</div>@enderror
 
         <div style="padding:16px 24px 8px;" id="med-rows">
+            @forelse($ordonnance->medicaments as $i => $med)
             <div class="med-row" style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:12px;align-items:end;padding-bottom:14px;border-bottom:1px solid rgba(52,168,140,.1);margin-bottom:14px;">
                 <div class="form-group" style="margin-bottom:0;">
                     <label class="form-label">Médicament / DCI <span style="color:#f43f5e;">*</span></label>
-                    <input type="text" class="form-control" name="meds[0][name]" value="{{ old('meds.0.name') }}" placeholder="Ex: Amlodipine 5mg, Paracétamol 1g…">
+                    <input type="text" class="form-control" name="meds[{{ $i }}][name]" value="{{ old("meds.$i.name", $med->nom) }}" placeholder="Ex: Amlodipine 5mg, Paracétamol 1g…">
                 </div>
                 <div class="form-group" style="margin-bottom:0;">
                     <label class="form-label">Posologie</label>
-                    <input type="text" class="form-control" name="meds[0][dosage]" value="{{ old('meds.0.dosage') }}" placeholder="Ex: 1/jour, 3×/jour">
+                    <input type="text" class="form-control" name="meds[{{ $i }}][dosage]" value="{{ old("meds.$i.dosage", $med->posologie) }}" placeholder="Ex: 1/jour, 3×/jour">
                 </div>
                 <div class="form-group" style="margin-bottom:0;">
                     <label class="form-label">Durée</label>
-                    <input type="text" class="form-control" name="meds[0][duration]" value="{{ old('meds.0.duration') }}" placeholder="Ex: 7 jours, 1 mois">
+                    <input type="text" class="form-control" name="meds[{{ $i }}][duration]" value="{{ old("meds.$i.duration", $med->duree) }}" placeholder="Ex: 7 jours, 1 mois">
                 </div>
                 <div style="padding-bottom:1px;">
                     <button type="button" class="btn btn-ghost btn-sm btn-icon-only" onclick="removeMedRow(this)" title="Supprimer" style="color:#f43f5e;">
@@ -130,11 +132,32 @@
                     </button>
                 </div>
             </div>
+            @empty
+            <div class="med-row" style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:12px;align-items:end;padding-bottom:14px;border-bottom:1px solid rgba(52,168,140,.1);margin-bottom:14px;">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label class="form-label">Médicament / DCI <span style="color:#f43f5e;">*</span></label>
+                    <input type="text" class="form-control" name="meds[0][name]" placeholder="Ex: Amlodipine 5mg, Paracétamol 1g…">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label class="form-label">Posologie</label>
+                    <input type="text" class="form-control" name="meds[0][dosage]" placeholder="Ex: 1/jour, 3×/jour">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label class="form-label">Durée</label>
+                    <input type="text" class="form-control" name="meds[0][duration]" placeholder="Ex: 7 jours, 1 mois">
+                </div>
+                <div style="padding-bottom:1px;">
+                    <button type="button" class="btn btn-ghost btn-sm btn-icon-only" onclick="removeMedRow(this)" title="Supprimer" style="color:#f43f5e;">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            </div>
+            @endforelse
         </div>
         <div style="padding:0 24px 20px;">
             <div class="form-group">
                 <label class="form-label">Instructions générales</label>
-                <textarea class="form-control @error('instructions') input-error @enderror" name="instructions" rows="2" placeholder="Ex: Prendre les médicaments pendant les repas. Éviter le soleil pendant le traitement.">{{ old('instructions') }}</textarea>
+                <textarea class="form-control @error('instructions') input-error @enderror" name="instructions" rows="2" placeholder="Ex: Prendre les médicaments pendant les repas. Éviter le soleil pendant le traitement.">{{ old('instructions', $ordonnance->instructions) }}</textarea>
                 @error('instructions')<div class="field-error">{{ $message }}</div>@enderror
             </div>
         </div>
@@ -157,22 +180,22 @@
             <div class="form-group">
                 <label class="form-label">Renouvellement</label>
                 <select class="form-control form-select" name="renouvelable">
-                    <option value="0" {{ old('renouvelable', 0) == 0 ? 'selected' : '' }}>Non renouvelable</option>
-                    <option value="1" {{ old('renouvelable') == 1 ? 'selected' : '' }}>Renouvelable 1 fois</option>
-                    <option value="2" {{ old('renouvelable') == 2 ? 'selected' : '' }}>Renouvelable 2 fois</option>
-                    <option value="3" {{ old('renouvelable') == 3 ? 'selected' : '' }}>Renouvelable 3 fois</option>
+                    <option value="0" {{ old('renouvelable', $ordonnance->renouvelable) == 0 ? 'selected' : '' }}>Non renouvelable</option>
+                    <option value="1" {{ old('renouvelable', $ordonnance->renouvelable) == 1 ? 'selected' : '' }}>Renouvelable 1 fois</option>
+                    <option value="2" {{ old('renouvelable', $ordonnance->renouvelable) == 2 ? 'selected' : '' }}>Renouvelable 2 fois</option>
+                    <option value="3" {{ old('renouvelable', $ordonnance->renouvelable) == 3 ? 'selected' : '' }}>Renouvelable 3 fois</option>
                 </select>
             </div>
             <div class="form-group">
                 <label class="form-label">Substitution générique</label>
                 <select class="form-control form-select" name="substitution_autorisee">
-                    <option value="1" {{ old('substitution_autorisee', '1') == '1' ? 'selected' : '' }}>Autorisée</option>
-                    <option value="0" {{ old('substitution_autorisee') == '0' ? 'selected' : '' }}>Non substituable</option>
+                    <option value="1" {{ old('substitution_autorisee', $ordonnance->substitution_autorisee ? '1' : '0') == '1' ? 'selected' : '' }}>Autorisée</option>
+                    <option value="0" {{ old('substitution_autorisee', $ordonnance->substitution_autorisee ? '1' : '0') == '0' ? 'selected' : '' }}>Non substituable</option>
                 </select>
             </div>
             <div class="form-group" style="grid-column:1/-1;">
                 <label class="form-label">Notes confidentielles (usage interne)</label>
-                <textarea class="form-control @error('notes_privees') input-error @enderror" name="notes_privees" rows="2" placeholder="Notes non imprimées sur l'ordonnance…">{{ old('notes_privees') }}</textarea>
+                <textarea class="form-control @error('notes_privees') input-error @enderror" name="notes_privees" rows="2" placeholder="Notes non imprimées sur l'ordonnance…">{{ old('notes_privees', $ordonnance->notes_privees) }}</textarea>
                 @error('notes_privees')<div class="field-error">{{ $message }}</div>@enderror
             </div>
         </div>
@@ -180,8 +203,8 @@
         <div style="padding:16px 24px;background:var(--teal-50);border-top:1px solid rgba(52,168,140,.1);display:flex;justify-content:flex-end;gap:10px;">
             <a href="{{ route('prescriptions.index') }}" class="btn btn-outline">Annuler</a>
             <button type="submit" class="btn btn-primary">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-                Émettre l'ordonnance
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Enregistrer les modifications
             </button>
         </div>
     </div>
@@ -210,7 +233,7 @@ textarea.form-control{resize:vertical;min-height:80px;line-height:1.65;}
 
 @push('scripts')
 <script>
-let medIndex = 1;
+let medIndex = {{ max($ordonnance->medicaments->count(), 1) }};
 
 function updateMedCount() {
     const count = document.querySelectorAll('.med-row').length;

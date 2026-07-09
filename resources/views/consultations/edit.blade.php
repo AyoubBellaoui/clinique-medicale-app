@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Nouvelle Consultation')
-@section('page-title', 'Nouvelle Consultation')
-@section('page-subtitle', 'Enregistrer une consultation médicale')
+@section('title', 'Modifier la Consultation')
+@section('page-title', 'Modifier la Consultation')
+@section('page-subtitle', 'Mettre à jour une consultation existante')
 
 @section('content')
 
@@ -12,8 +12,9 @@
     Retour aux consultations
 </a>
 
-<form action="{{ route('consultations.store') }}" method="POST">
+<form action="{{ route('consultations.update', $consultation->id) }}" method="POST">
     @csrf
+    @method('PUT')
 
     {{-- Patient & Doctor --}}
     <div class="card" style="margin-bottom:16px;overflow:hidden;">
@@ -34,7 +35,7 @@
                 <select class="form-control form-select @error('patient_id') input-error @enderror" name="patient_id">
                     <option value="">— Sélectionner un patient —</option>
                     @foreach($patients as $p)
-                        <option value="{{ $p->id }}" {{ old('patient_id') == $p->id ? 'selected' : '' }}>
+                        <option value="{{ $p->id }}" {{ old('patient_id', $consultation->patient_id) == $p->id ? 'selected' : '' }}>
                             {{ $p->full_name }} @if($p->cin) (CIN: {{ $p->cin }}) @endif
                         </option>
                     @endforeach
@@ -46,7 +47,7 @@
                 <select class="form-control form-select @error('staff_id') input-error @enderror" name="staff_id">
                     <option value="">— Sélectionner un médecin —</option>
                     @foreach($doctors as $d)
-                        <option value="{{ $d->id }}" {{ old('staff_id') == $d->id ? 'selected' : '' }}>
+                        <option value="{{ $d->id }}" {{ old('staff_id', $consultation->staff_id) == $d->id ? 'selected' : '' }}>
                             Dr. {{ $d->full_name }} @if($d->specialite) — {{ $d->specialite }} @endif
                         </option>
                     @endforeach
@@ -57,13 +58,13 @@
                 <label class="form-label">Date <span style="color:#f43f5e;">*</span></label>
                 <div style="position:relative;">
                     <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
-                    <input datepicker datepicker-autohide datepicker-format="yyyy-mm-dd" type="text" class="form-control @error('date') input-error @enderror" name="date" id="consult_date" value="{{ old('date', today()->format('Y-m-d')) }}" placeholder="aaaa-mm-jj" autocomplete="off" style="padding-left:36px;">
+                    <input datepicker datepicker-autohide datepicker-format="yyyy-mm-dd" type="text" class="form-control @error('date') input-error @enderror" name="date" id="consult_date" value="{{ old('date', $consultation->date_consultation->format('Y-m-d')) }}" placeholder="aaaa-mm-jj" autocomplete="off" style="padding-left:36px;">
                 </div>
                 @error('date')<div class="field-error">{{ $message }}</div>@enderror
             </div>
             <div class="form-group">
                 <label class="form-label">Heure</label>
-                <input type="time" class="form-control @error('heure') input-error @enderror" name="heure" value="{{ old('heure', now()->format('H:i')) }}">
+                <input type="time" class="form-control @error('heure') input-error @enderror" name="heure" value="{{ old('heure', $consultation->date_consultation->format('H:i')) }}">
                 @error('heure')<div class="field-error">{{ $message }}</div>@enderror
             </div>
             <div class="form-group">
@@ -76,13 +77,13 @@
                         'controle_post_operatoire' => 'Contrôle post-opératoire',
                         'bilan_complet' => 'Bilan complet',
                     ] as $value => $label)
-                        <option value="{{ $value }}" {{ old('type_consultation') == $value ? 'selected' : '' }}>{{ $label }}</option>
+                        <option value="{{ $value }}" {{ old('type_consultation', $consultation->type_consultation) == $value ? 'selected' : '' }}>{{ $label }}</option>
                     @endforeach
                 </select>
             </div>
             <div class="form-group" style="grid-column:1/-1;">
                 <label class="form-label">Motif de consultation</label>
-                <input type="text" class="form-control @error('motif') input-error @enderror" name="motif" value="{{ old('motif') }}" placeholder="Ex: Douleurs thoraciques, toux persistante…">
+                <input type="text" class="form-control @error('motif') input-error @enderror" name="motif" value="{{ old('motif', $consultation->motif) }}" placeholder="Ex: Douleurs thoraciques, toux persistante…">
                 @error('motif')<div class="field-error">{{ $message }}</div>@enderror
             </div>
         </div>
@@ -106,46 +107,46 @@
             <div class="form-group">
                 <label class="form-label">Tension artérielle (mmHg)</label>
                 <div style="display:flex;gap:8px;align-items:center;">
-                    <input type="number" class="form-control @error('tension_systolique') input-error @enderror" name="tension_systolique" value="{{ old('tension_systolique') }}" placeholder="Sys" style="width:80px;" min="50" max="300">
+                    <input type="number" class="form-control @error('tension_systolique') input-error @enderror" name="tension_systolique" value="{{ old('tension_systolique', $consultation->tension_systolique) }}" placeholder="Sys" style="width:80px;" min="50" max="300">
                     <span style="color:var(--muted);font-weight:700;">/</span>
-                    <input type="number" class="form-control @error('tension_diastolique') input-error @enderror" name="tension_diastolique" value="{{ old('tension_diastolique') }}" placeholder="Dia" style="width:80px;" min="30" max="200">
+                    <input type="number" class="form-control @error('tension_diastolique') input-error @enderror" name="tension_diastolique" value="{{ old('tension_diastolique', $consultation->tension_diastolique) }}" placeholder="Dia" style="width:80px;" min="30" max="200">
                 </div>
                 @error('tension_systolique')<div class="field-error">{{ $message }}</div>@enderror
                 @error('tension_diastolique')<div class="field-error">{{ $message }}</div>@enderror
             </div>
             <div class="form-group">
                 <label class="form-label">Fréquence cardiaque (bpm)</label>
-                <input type="number" class="form-control @error('frequence_cardiaque') input-error @enderror" name="frequence_cardiaque" value="{{ old('frequence_cardiaque') }}" placeholder="Ex: 72" min="30" max="250">
+                <input type="number" class="form-control @error('frequence_cardiaque') input-error @enderror" name="frequence_cardiaque" value="{{ old('frequence_cardiaque', $consultation->frequence_cardiaque) }}" placeholder="Ex: 72" min="30" max="250">
                 @error('frequence_cardiaque')<div class="field-error">{{ $message }}</div>@enderror
             </div>
             <div class="form-group">
                 <label class="form-label">Température (°C)</label>
-                <input type="number" class="form-control @error('temperature') input-error @enderror" name="temperature" value="{{ old('temperature') }}" placeholder="Ex: 37.2" step="0.1" min="30" max="45">
+                <input type="number" class="form-control @error('temperature') input-error @enderror" name="temperature" value="{{ old('temperature', $consultation->temperature) }}" placeholder="Ex: 37.2" step="0.1" min="30" max="45">
                 @error('temperature')<div class="field-error">{{ $message }}</div>@enderror
             </div>
             <div class="form-group">
                 <label class="form-label">Saturation O₂ (%)</label>
-                <input type="number" class="form-control @error('spo2') input-error @enderror" name="spo2" value="{{ old('spo2') }}" placeholder="Ex: 98" min="0" max="100">
+                <input type="number" class="form-control @error('spo2') input-error @enderror" name="spo2" value="{{ old('spo2', $consultation->spo2) }}" placeholder="Ex: 98" min="0" max="100">
                 @error('spo2')<div class="field-error">{{ $message }}</div>@enderror
             </div>
             <div class="form-group">
                 <label class="form-label">Poids (kg)</label>
-                <input type="number" class="form-control @error('poids') input-error @enderror" name="poids" value="{{ old('poids') }}" placeholder="Ex: 72" step="0.1" min="0" max="500">
+                <input type="number" class="form-control @error('poids') input-error @enderror" name="poids" value="{{ old('poids', $consultation->poids) }}" placeholder="Ex: 72" step="0.1" min="0" max="500">
                 @error('poids')<div class="field-error">{{ $message }}</div>@enderror
             </div>
             <div class="form-group">
                 <label class="form-label">Taille (cm)</label>
-                <input type="number" class="form-control @error('taille') input-error @enderror" name="taille" value="{{ old('taille') }}" placeholder="Ex: 175" min="0" max="250">
+                <input type="number" class="form-control @error('taille') input-error @enderror" name="taille" value="{{ old('taille', $consultation->taille) }}" placeholder="Ex: 175" min="0" max="250">
                 @error('taille')<div class="field-error">{{ $message }}</div>@enderror
             </div>
             <div class="form-group" style="grid-column:1/-1;">
                 <label class="form-label">Diagnostic</label>
-                <textarea class="form-control @error('diagnostic') input-error @enderror" name="diagnostic" rows="3" placeholder="Diagnostic clinique…">{{ old('diagnostic') }}</textarea>
+                <textarea class="form-control @error('diagnostic') input-error @enderror" name="diagnostic" rows="3" placeholder="Diagnostic clinique…">{{ old('diagnostic', $consultation->diagnostic) }}</textarea>
                 @error('diagnostic')<div class="field-error">{{ $message }}</div>@enderror
             </div>
             <div class="form-group" style="grid-column:1/-1;">
                 <label class="form-label">Traitement prescrit</label>
-                <textarea class="form-control @error('traitement') input-error @enderror" name="traitement" rows="3" placeholder="Traitement médical recommandé…">{{ old('traitement') }}</textarea>
+                <textarea class="form-control @error('traitement') input-error @enderror" name="traitement" rows="3" placeholder="Traitement médical recommandé…">{{ old('traitement', $consultation->traitement) }}</textarea>
                 @error('traitement')<div class="field-error">{{ $message }}</div>@enderror
             </div>
         </div>
@@ -173,7 +174,7 @@
                     ['kine_demandee', 'Kinésithérapie',         'Recommander une rééducation'],
                 ] as [$key, $label, $desc])
                 <label class="exam-check-row">
-                    <input type="checkbox" name="{{ $key }}" value="1" {{ old($key) ? 'checked' : '' }} style="margin-top:2px;width:16px;height:16px;accent-color:var(--teal-500);">
+                    <input type="checkbox" name="{{ $key }}" value="1" {{ old($key, $consultation->$key) ? 'checked' : '' }} style="margin-top:2px;width:16px;height:16px;accent-color:var(--teal-500);">
                     <div>
                         <div style="font-size:13.5px;font-weight:600;color:var(--teal-800);">{{ $label }}</div>
                         <div style="font-size:12px;color:var(--muted);margin-top:2px;">{{ $desc }}</div>
@@ -186,9 +187,10 @@
                     <label class="form-label">Prochain rendez-vous</label>
                     <div style="position:relative;">
                         <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
-                        <input datepicker datepicker-autohide datepicker-format="yyyy-mm-dd" type="text" class="form-control @error('prochain_rdv_date') input-error @enderror" name="prochain_rdv_date" id="next_visit" value="{{ old('prochain_rdv_date') }}" placeholder="aaaa-mm-jj" autocomplete="off" style="padding-left:36px;">
+                        <input datepicker datepicker-autohide datepicker-format="yyyy-mm-dd" type="text" class="form-control @error('prochain_rdv_date') input-error @enderror" name="prochain_rdv_date" id="next_visit" value="{{ old('prochain_rdv_date', optional($consultation->prochain_rdv_date)->format('Y-m-d')) }}" placeholder="aaaa-mm-jj" autocomplete="off" style="padding-left:36px;">
                     </div>
                     @error('prochain_rdv_date')<div class="field-error">{{ $message }}</div>@enderror
+                    <div style="margin-top:6px;font-size:11.5px;color:var(--muted);">Modifier cette date ne reprogramme pas automatiquement un rendez-vous déjà créé.</div>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Dans</label>
@@ -204,7 +206,7 @@
                 </div>
                 <div class="form-group" style="grid-column:1/-1;">
                     <label class="form-label">Notes du médecin</label>
-                    <textarea class="form-control @error('notes') input-error @enderror" name="notes" rows="3" placeholder="Observations, recommandations particulières…">{{ old('notes') }}</textarea>
+                    <textarea class="form-control @error('notes') input-error @enderror" name="notes" rows="3" placeholder="Observations, recommandations particulières…">{{ old('notes', $consultation->notes) }}</textarea>
                     @error('notes')<div class="field-error">{{ $message }}</div>@enderror
                 </div>
             </div>
@@ -213,8 +215,8 @@
         <div style="padding:16px 24px;background:var(--teal-50);border-top:1px solid rgba(52,168,140,.1);display:flex;justify-content:flex-end;gap:10px;">
             <a href="{{ route('consultations.index') }}" class="btn btn-outline">Annuler</a>
             <button type="submit" class="btn btn-primary">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-                Enregistrer la consultation
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Enregistrer les modifications
             </button>
         </div>
     </div>

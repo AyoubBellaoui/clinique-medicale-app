@@ -8,14 +8,36 @@ class Consultation extends Model
 {
     protected $fillable = [
         'date_consultation',
+        'motif',
+        'type_consultation',
+        'tension_systolique',
+        'tension_diastolique',
+        'frequence_cardiaque',
+        'temperature',
+        'spo2',
+        'poids',
+        'taille',
         'diagnostic',
+        'traitement',
         'notes',
+        'ordonnance_demandee',
+        'scanner_demande',
+        'analyse_demandee',
+        'kine_demandee',
+        'prochain_rdv_date',
         'patient_id',
         'staff_id',
     ];
 
     protected $casts = [
-        'date_consultation' => 'datetime',
+        'date_consultation'    => 'datetime',
+        'prochain_rdv_date'    => 'date',
+        'ordonnance_demandee'  => 'boolean',
+        'scanner_demande'      => 'boolean',
+        'analyse_demandee'     => 'boolean',
+        'kine_demandee'        => 'boolean',
+        'temperature'          => 'float',
+        'poids'                => 'float',
     ];
 
     public function patient()

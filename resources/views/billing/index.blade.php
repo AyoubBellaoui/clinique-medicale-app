@@ -2,53 +2,31 @@
 
 @section('title', 'Factures')
 @section('page-title', 'Factures')
-@section('page-subtitle', '8 factures ce mois')
+@section('page-subtitle', $factures->count() . ' facture' . ($factures->count() > 1 ? 's' : '') . ' au total')
 
 @section('content')
-
-@php
-$invoices = [
-    ['id'=>'FAC-2026-0047','initials'=>'OB','color'=>'teal',  'patient'=>'Omar Benhaddou',  'date'=>'Aujourd\'hui 09:00','amount'=>450, 'status'=>'payé'],
-    ['id'=>'FAC-2026-0046','initials'=>'MT','color'=>'blue',  'patient'=>'Meriem Tahiri',   'date'=>'Aujourd\'hui 06:30','amount'=>650, 'status'=>'en_attente'],
-    ['id'=>'FAC-2026-0045','initials'=>'RA','color'=>'amber', 'patient'=>'Rachid Amrani',   'date'=>'Hier 10:00',        'amount'=>300, 'status'=>'payé'],
-    ['id'=>'FAC-2026-0044','initials'=>'NF','color'=>'rose',  'patient'=>'Nadia Filali',    'date'=>'Hier 06:00',        'amount'=>400, 'status'=>'payé'],
-    ['id'=>'FAC-2026-0043','initials'=>'FE','color'=>'teal',  'patient'=>'Fatima El Idrissi','date'=>'il y a 2j',        'amount'=>250, 'status'=>'payé'],
-    ['id'=>'FAC-2026-0042','initials'=>'AM','color'=>'amber', 'patient'=>'Aicha Moussaoui', 'date'=>'il y a 3j',         'amount'=>850, 'status'=>'retard'],
-    ['id'=>'FAC-2026-0041','initials'=>'HO','color'=>'rose',  'patient'=>'Hassan Ouazzani', 'date'=>'il y a 7j',         'amount'=>320, 'status'=>'payé'],
-    ['id'=>'FAC-2026-0040','initials'=>'YB','color'=>'blue',  'patient'=>'Youssef Benali',  'date'=>'il y a 10j',        'amount'=>250, 'status'=>'payé'],
-];
-$paid    = array_sum(array_column(array_filter($invoices, fn($i) => $i['status']==='payé'),    'amount'));
-$pending = array_sum(array_column(array_filter($invoices, fn($i) => $i['status']==='en_attente'),'amount'));
-$overdue = array_sum(array_column(array_filter($invoices, fn($i) => $i['status']==='retard'),  'amount'));
-$statusMap = [
-    'payé'       => ['green','Payé'],
-    'en_attente' => ['amber','En attente'],
-    'retard'     => ['rose', 'En retard'],
-];
-@endphp
 
 {{-- Revenue summary --}}
 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;">
     <div style="padding:20px;border-radius:14px;background:linear-gradient(135deg,#fff,rgba(16,185,129,.06));border:1px solid rgba(16,185,129,.2);position:relative;overflow:hidden;">
         <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Encaissé</div>
         <div style="font-size:26px;font-weight:800;color:var(--teal-800);font-variant-numeric:tabular-nums;letter-spacing:-.4px;">
-            {{ number_format($paid,0,',',' ') }} <span style="font-size:13px;font-weight:600;color:var(--muted);">MAD</span>
+            {{ number_format($paidTotal,0,',',' ') }} <span style="font-size:13px;font-weight:600;color:var(--muted);">MAD</span>
         </div>
-        <div class="stat-trend up" style="margin-top:8px;">↑ +18% vs mois dernier</div>
     </div>
     <div style="padding:20px;border-radius:14px;background:linear-gradient(135deg,#fff,rgba(245,158,11,.06));border:1px solid rgba(245,158,11,.2);">
         <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">En attente</div>
         <div style="font-size:26px;font-weight:800;color:var(--teal-800);font-variant-numeric:tabular-nums;letter-spacing:-.4px;">
-            {{ number_format($pending,0,',',' ') }} <span style="font-size:13px;font-weight:600;color:var(--muted);">MAD</span>
+            {{ number_format($pendingTotal,0,',',' ') }} <span style="font-size:13px;font-weight:600;color:var(--muted);">MAD</span>
         </div>
-        <div class="stat-trend warn" style="margin-top:8px;">● 1 facture en attente</div>
+        <div class="stat-trend warn" style="margin-top:8px;">● {{ $pendingCount }} facture{{ $pendingCount > 1 ? 's' : '' }} en attente</div>
     </div>
     <div style="padding:20px;border-radius:14px;background:linear-gradient(135deg,#fff,rgba(244,63,94,.06));border:1px solid rgba(244,63,94,.2);">
         <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">En retard</div>
         <div style="font-size:26px;font-weight:800;color:var(--teal-800);font-variant-numeric:tabular-nums;letter-spacing:-.4px;">
-            {{ number_format($overdue,0,',',' ') }} <span style="font-size:13px;font-weight:600;color:var(--muted);">MAD</span>
+            {{ number_format($overdueTotal,0,',',' ') }} <span style="font-size:13px;font-weight:600;color:var(--muted);">MAD</span>
         </div>
-        <div class="stat-trend down" style="margin-top:8px;">↓ 1 facture en retard</div>
+        <div class="stat-trend down" style="margin-top:8px;">↓ {{ $overdueCount }} facture{{ $overdueCount > 1 ? 's' : '' }} en retard</div>
     </div>
 </div>
 
@@ -79,14 +57,10 @@ $statusMap = [
     <div class="card-header">
         <div class="section-title">
             <div class="accent-bar"></div>
-            <div><h3>Factures</h3><span>{{ count($invoices) }} factures</span></div>
+            <div><h3>Factures</h3><span>{{ $factures->count() }} facture{{ $factures->count() > 1 ? 's' : '' }}</span></div>
         </div>
         <div style="display:flex;gap:8px;">
-            <button class="btn btn-outline btn-sm">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
-                Exporter
-            </button>
-            <a href="{{ url('/billing/create') }}" class="btn btn-primary btn-sm">
+            <a href="{{ route('billing.create') }}" class="btn btn-primary btn-sm">
                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
                 Nouvelle Facture
             </a>
@@ -106,45 +80,53 @@ $statusMap = [
                 </tr>
             </thead>
             <tbody>
-                @foreach($invoices as $inv)
-                @php [$sc,$sl] = $statusMap[$inv['status']] ?? ['gray',$inv['status']]; @endphp
+                @forelse($factures as $f)
+                @php
+                    if ($f->statut === 'paye') { [$sc, $sl] = ['green', 'Payé']; }
+                    elseif ($f->isOverdue()) { [$sc, $sl] = ['rose', 'En retard']; }
+                    else { [$sc, $sl] = ['amber', 'En attente']; }
+                    $initials = strtoupper(substr($f->patient->prenom ?? '', 0, 1) . substr($f->patient->nom ?? '', 0, 1));
+                @endphp
                 <tr>
-                    <td><span class="text-mono" style="font-weight:600;color:var(--teal-700);">{{ $inv['id'] }}</span></td>
+                    <td><span class="text-mono" style="font-weight:600;color:var(--teal-700);">{{ $f->numero }}</span></td>
                     <td>
                         <div class="avatar-chip">
-                            <div class="avatar {{ $inv['color'] }}">{{ $inv['initials'] }}</div>
-                            <div class="avatar-info"><p>{{ $inv['patient'] }}</p></div>
+                            <div class="avatar {{ $f->patient->color ?? 'teal' }}">{{ $initials ?: '?' }}</div>
+                            <div class="avatar-info"><p>{{ $f->patient->full_name ?? 'Patient supprimé' }}</p></div>
                         </div>
                     </td>
-                    <td style="color:var(--muted);">{{ $inv['date'] }}</td>
-                    <td><strong style="color:var(--teal-800);font-variant-numeric:tabular-nums;">{{ number_format($inv['amount'],0,',',' ') }} MAD</strong></td>
+                    <td style="color:var(--muted);">{{ $f->date_facturation->format('d/m/Y') }}</td>
+                    <td><strong style="color:var(--teal-800);font-variant-numeric:tabular-nums;">{{ number_format($f->total_ttc,0,',',' ') }} MAD</strong></td>
                     <td><span class="badge badge-{{ $sc }}">{{ $sl }}</span></td>
                     <td>
                         <div style="display:flex;gap:4px;">
-                            <button class="btn btn-outline btn-sm btn-icon-only" title="Voir">
-                                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            </button>
-                            <button class="btn btn-outline btn-sm btn-icon-only" title="Télécharger">
-                                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
-                            </button>
-                            @if($inv['status'] !== 'payé')
-                                <button class="btn btn-success btn-sm">Marquer payé</button>
+                            <a href="{{ route('billing.edit', $f->id) }}" class="btn btn-outline btn-sm btn-icon-only" title="Modifier">
+                                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg>
+                            </a>
+                            <form method="POST" action="{{ route('billing.delete', $f->id) }}" onsubmit="return confirm('Supprimer cette facture ?')" style="display:inline;">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="btn btn-outline btn-sm btn-icon-only" title="Supprimer">
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                                </button>
+                            </form>
+                            @if($f->statut !== 'paye')
+                                <form method="POST" action="{{ route('billing.markPaid', $f->id) }}" style="display:inline;">
+                                    @csrf @method('PUT')
+                                    <button type="submit" class="btn btn-success btn-sm">Marquer payé</button>
+                                </form>
                             @endif
                         </div>
                     </td>
                 </tr>
-                @endforeach
+                @empty
+                <tr>
+                    <td colspan="6" style="padding:40px 20px;text-align:center;color:var(--muted);font-size:13px;">
+                        Aucune facture enregistrée. <a href="{{ route('billing.create') }}" style="color:var(--teal-600);font-weight:600;">En créer une</a>.
+                    </td>
+                </tr>
+                @endforelse
             </tbody>
         </table>
-    </div>
-
-    <div class="pagination">
-        <span>Affichage 1–8 sur 8</span>
-        <div class="pagination-btns">
-            <button class="page-btn" disabled>‹</button>
-            <button class="page-btn active">1</button>
-            <button class="page-btn" disabled>›</button>
-        </div>
     </div>
 </div>
 
@@ -158,10 +140,10 @@ $statusMap = [
         new Chart(revenueCtx, {
             type: 'bar',
             data: {
-                labels: ['Nov','Déc','Jan','Fév','Mar','Avr'],
+                labels: @json(array_column($monthlyRevenue, 'label')),
                 datasets: [{
                     label: 'Revenus',
-                    data: [18500, 22300, 24800, 21200, 27500, 32400],
+                    data: @json(array_column($monthlyRevenue, 'total')),
                     backgroundColor: (ctx) => {
                         const g = ctx.chart.ctx.createLinearGradient(0,0,0,220);
                         g.addColorStop(0,'rgba(52,168,140,.9)');
@@ -190,13 +172,18 @@ $statusMap = [
 
     const paymentCtx = document.getElementById('paymentChart');
     if(paymentCtx) {
+        const labels = @json(array_values($paymentLabels));
+        const keys = @json(array_keys($paymentLabels));
+        const breakdown = @json($paymentBreakdown);
+        const data = keys.map(k => breakdown[k] || 0);
+
         new Chart(paymentCtx, {
             type: 'polarArea',
             data: {
-                labels: ['Espèces','Carte','Chèque','Virement'],
+                labels: labels,
                 datasets: [{
-                    data: [45,35,12,8],
-                    backgroundColor: ['rgba(52,168,140,.7)','rgba(59,130,246,.7)','rgba(245,158,11,.7)','rgba(139,92,246,.7)'],
+                    data: data,
+                    backgroundColor: ['rgba(52,168,140,.7)','rgba(59,130,246,.7)','rgba(245,158,11,.7)','rgba(139,92,246,.7)','rgba(244,63,94,.7)'],
                     borderWidth: 2, borderColor: '#fff'
                 }]
             },
