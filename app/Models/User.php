@@ -41,6 +41,7 @@ class User extends Authenticatable
     protected $primaryKey = 'id';
 
     protected $fillable = [
+        'name',
         'email',
         'password',
         'role',
@@ -52,14 +53,32 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    // Laravel auth uses 'name' in some places — provide a fallback
+    public const MEDICAL_ROLES = ['medecin', 'infirmier'];
+    public const SUPPORT_ROLES = ['secretariat', 'technicien'];
+
+    // Falls back to the linked staff profile's name, then email, when no name is set.
     public function getNameAttribute(): string
     {
-        return $this->staff?->full_name ?? $this->email;
+        return $this->attributes['name'] ?? $this->staff?->full_name ?? $this->email;
     }
 
     public function staff()
     {
         return $this->belongsTo(StaffMedical::class, 'staff_id');
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isMedical(): bool
+    {
+        return in_array($this->role, self::MEDICAL_ROLES, true);
+    }
+
+    public function isSupport(): bool
+    {
+        return in_array($this->role, self::SUPPORT_ROLES, true);
     }
 }

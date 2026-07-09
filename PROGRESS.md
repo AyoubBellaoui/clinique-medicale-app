@@ -106,25 +106,44 @@ Revisited the "Facturation paid → auto-mark the rendez-vous `termine`" idea lo
 
 With Facturation done, all seven core modules (Patients, Staff médical, File d'attente, Rendez-vous, Consultations, Ordonnances, Facturation) are now fully working end-to-end — see the status table below.
 
+**25. Wired up Mon compte (Account) editing**
+Every field on this page was hardcoded ("Dr. Admin", a fake phone number, a fake bio, fake stats) and none of the four tabs' forms had an `action` or submitted anywhere — `AccountController` just returned the view with no data at all. Added a nullable `name` column to `users` (migration `add_name_to_users_table`) since the table only had `email`/`password`/`role`/`staff_id` — nowhere to persist an editable display name. `User::getNameAttribute()` now prefers that stored name, then falls back to the linked staff profile's name, then the email, same fallback chain as before just with a real value able to take priority.
+
+Rewired the **Profil** tab to a real form (`PUT /account/update`) editing `name`/`email`, with `role` shown read-only (not user-editable — it's a permissions-relevant field, changing it doesn't belong in self-service account editing) and email uniqueness validated against other users. Rewired **Sécurité**'s password form to a real one (`PUT /account/password`) that requires the current password (verified via `Hash::check`) before accepting a new one (min 8 chars, confirmed). Wired the profile card's stats (Consultations/Patients/Staff counts) and info list (email, "Membre depuis" from `created_at`) to real data — dropped "Téléphone"/"Localisation" since nothing tracks those for a `User` account, and dropped the "Photo"/"Partager" buttons and the "Supprimer mon compte" block since none of those have (or should have, for self-deletion) a real feature behind them and a decorative destructive-looking button is worse than no button.
+
+Left the **Préférences** and **Notifications** tabs untouched — deliberately. They're toggle switches with no save button at all (client-side only), for settings with no real system behind them in this app (no i18n, no SMS/sound delivery), so there was nothing false to fix; building real persistence for them would mean inventing whole subsystems that weren't asked for.
+
+Verified end-to-end against the real database, including the risky part — this touches the actual login credentials: submitted a name update (persisted, displayed, reverted to null afterward); confirmed an empty email is rejected; confirmed a password change is rejected with a wrong current password *and* with a mismatched confirmation (verified original password still logs in after both); performed a real password change, logged in with the new password to confirm it took effect, then changed it back to the original and re-verified login — the admin account was left in exactly the state it was found in.
+
+**26. Role-based access control + admin-managed user accounts**
+Until now every logged-in user could reach every route — `role` existed on `User` (default `medecin`) but nothing ever read it. Decided against self-service "forgot password" (single-admin system, admin has full control to reset anyone's password directly) and built role-based restrictions instead, plus the account-management screen needed to make that mean anything (previously only one user — the admin — existed at all).
+
+Modeled three permission tiers instead of five separate per-role rules, since that's what the app's actual modules justify: **admin** (everything, including HR-sensitive Staff Médical data and account management), **medical** (`medecin`/`infirmier` — Consultations and Ordonnances, i.e. diagnostic/prescription records), **support** (`secretariat`/`technicien` — Facturation, i.e. billing). Patients, File d'attente, and Rendez-vous stay open to every authenticated role since front-desk/scheduling staff and clinical staff both need them day to day. Added `User::isAdmin()`/`isMedical()`/`isSupport()` helpers and a new `EnsureRole` middleware (registered as the `role` alias in `bootstrap/app.php`, Laravel 11's middleware registration point — there's no `Kernel.php` in this version) that admins always pass regardless of which tier a route requires; a blocked request redirects to the dashboard with a flash error rather than a bare 403 page. Applied `role`/`role:medical`/`role:support` to the relevant route groups in `web.php`, and hid the corresponding sidebar links per role in `layouts/app.blade.php` so people don't even see options they can't use — the middleware is the actual security boundary, the hidden nav link is just not showing someone a door that's locked anyway.
+
+Built a new admin-only **Utilisateurs** module (`UserController`, first controller in this app with no self-service equivalent) to manage login accounts: create one (optionally linked to an unlinked `StaffMedical` record via a new `StaffMedical::user()` hasOne — the inverse of `User::staff()`), edit its name/email/role/staff link, and — the direct replacement for self-service password reset — a dedicated "Réinitialiser le mot de passe" action that lets the admin set a new password for any account with no current-password check, matching the stated design ("admin has full control, no forgot-password flow needed"). Added two safety guards a real admin panel needs: a user can't delete their own account through this screen (self-lockout risk), and the system refuses to demote or delete the *last* remaining admin account (would lock everyone out of user management permanently).
+
+Verified end-to-end against the real database: admin reaches every module including the new Utilisateurs page; a created `secretariat` account can reach Patients/File d'attente/Rendez-vous/Facturation but is redirected away from Staff/Consultations/Ordonnances/Utilisateurs; a created `medecin` account shows the exact opposite pattern (Consultations/Ordonnances reachable, Facturation/Staff/Utilisateurs blocked); the sidebar correctly hides the links each role can't use; admin-driven password reset works (logged in as the target user with the new password to confirm); self-deletion is rejected; demoting the sole admin account is rejected with the account left unchanged. All test accounts created during verification were deleted afterward, leaving only the original admin account.
+
 ---
 
 ## Where things stand right now
 
 | Module | Status |
 |---|---|
-| Auth | ✅ Login/logout + rate limiting work. "Forgot password" view exists, no backend. |
+| Auth | ✅ Login/logout + rate limiting work. "Forgot password" intentionally not built — single-admin system, admin resets accounts directly instead (see Utilisateurs). |
 | **Patients** | ✅ Full CRUD, working end-to-end. |
-| **Staff médical** | ✅ Full CRUD, working end-to-end. |
+| **Staff médical** | ✅ Full CRUD, working end-to-end. Admin-only. |
 | **File d'attente** (Queue) | ✅ Full CRUD, working end-to-end. |
 | **Rendez-vous** (Appointments) | ✅ Full CRUD, working end-to-end. |
-| **Consultations** | ✅ Full CRUD, working end-to-end. |
-| **Ordonnances** (Prescriptions) | ✅ Full CRUD, working end-to-end. |
-| **Facturation** (Billing) | ✅ Full CRUD, working end-to-end. |
+| **Consultations** | ✅ Full CRUD, working end-to-end. Medical-staff-only. |
+| **Ordonnances** (Prescriptions) | ✅ Full CRUD, working end-to-end. Medical-staff-only. |
+| **Facturation** (Billing) | ✅ Full CRUD, working end-to-end. Admin/support-staff-only. |
+| **Utilisateurs** (User accounts) | ✅ Admin-only: create/edit accounts, assign roles, reset passwords. |
 | Notifications | ✅ Working, broadcasts from Patients/Staff/Queue/Rendez-vous/Consultations/Ordonnances/Facturation. |
-| Mon compte (Account) | ⚠️ Displays only, no editing. |
+| Mon compte (Account) | ✅ Profile + password editing work. Préférences/Notifications tabs remain decorative (no real system behind them). |
 | Dashboard | ✅ Working. |
 
-**Bottom line:** all seven core clinic modules are now fully working end-to-end, each built on the same pattern (validation → model → `ClinicNotification::broadcast` → flash message → redirect), verified against the real database, not just eyeballed. What's left is peripheral, not core workflow: "Mon compte" has no editing, "Mot de passe oublié" has no backend, and UML/report material in `UML/`/`Rapport/` is documentation rather than app code. Worth deciding next: polish/harden what exists (e.g. the deferred Facturation↔Consultation↔Rendez-vous auto-close loop, or a `Consultation → RendezVous` link to unlock it), or finish the remaining peripheral pieces (Account editing, password reset).
+**Bottom line:** all seven core clinic modules are fully working end-to-end, each built on the same pattern (validation → model → `ClinicNotification::broadcast` → flash message → redirect), verified against the real database, not just eyeballed. Account editing and role-based access control are both done too — medical records (Consultations/Ordonnances) are restricted to clinical staff, billing to admin/support staff, HR data (Staff Médical) and account management to admin only. What's left is genuinely peripheral: UML/report material in `UML/`/`Rapport/` is documentation rather than app code, there's no automated test suite (everything verified via live HTTP requests instead), and the Facturation↔Consultation↔Rendez-vous auto-close loop is still deliberately deferred (needs a `Consultation → RendezVous` link to unlock reliably). Soft deletes for medical records (Patients/Consultations/Ordonnances/Factures) remain a good next step for a healthcare app specifically — right now deletion is permanent.
 
 ---
 

@@ -11,6 +11,7 @@ use App\Http\Controllers\OrdonnancesController;
 use App\Http\Controllers\RendezVousController;
 use App\Http\Controllers\FacturesController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PatientsController;
 use App\Http\Controllers\SearchController;
@@ -35,13 +36,15 @@ Route::middleware('auth')->group(function () {
     Route::put('/patients/{id}/update', [PatientController::class, 'update'])->name('patients.update');
     Route::delete('/patients/delete/{id}', [PatientController::class, 'destroy'])->name('patients.delete');
 
-    // Staff Medical
-    Route::get('/staff', [StaffMedicalController::class, 'index'])->name('staff.index');
-    Route::get('/staff/create', [StaffMedicalController::class, 'create'])->name('staff.create');
-    Route::post('/staff/store', [StaffMedicalController::class, 'store'])->name('staff.store');
-    Route::get('/staff/{id}/edit', [StaffMedicalController::class, 'edit'])->name('staff.edit');
-    Route::put('/staff/{id}/update', [StaffMedicalController::class, 'update'])->name('staff.update');
-    Route::delete('/Staff/delete/{id}', [StaffMedicalController::class, 'destroy'])->name('staff.delete');
+    // Staff Medical — HR-sensitive (salary/contract data), admin only
+    Route::middleware('role')->group(function () {
+        Route::get('/staff', [StaffMedicalController::class, 'index'])->name('staff.index');
+        Route::get('/staff/create', [StaffMedicalController::class, 'create'])->name('staff.create');
+        Route::post('/staff/store', [StaffMedicalController::class, 'store'])->name('staff.store');
+        Route::get('/staff/{id}/edit', [StaffMedicalController::class, 'edit'])->name('staff.edit');
+        Route::put('/staff/{id}/update', [StaffMedicalController::class, 'update'])->name('staff.update');
+        Route::delete('/Staff/delete/{id}', [StaffMedicalController::class, 'destroy'])->name('staff.delete');
+    });
 
     // File d'attente
     Route::get('/fileAttente', [FileAttenteController::class, 'index'])->name('fileAttente.index');
@@ -59,33 +62,52 @@ Route::middleware('auth')->group(function () {
     Route::put('/appointments/{id}/update', [RendezVousController::class, 'update'])->name('appointments.update');
     Route::delete('/appointments/delete/{id}', [RendezVousController::class, 'destroy'])->name('appointments.delete');
 
-    // Consultations
-    Route::get('/consultations', [ConsultationController::class, 'index'])->name('consultations.index');
-    Route::get('/consultations/create', [ConsultationController::class, 'create'])->name('consultations.create');
-    Route::post('/consultations/store', [ConsultationController::class, 'store'])->name('consultations.store');
-    Route::get('/consultations/{id}/edit', [ConsultationController::class, 'edit'])->name('consultations.edit');
-    Route::put('/consultations/{id}/update', [ConsultationController::class, 'update'])->name('consultations.update');
-    Route::delete('/consultations/delete/{id}', [ConsultationController::class, 'destroy'])->name('consultations.delete');
+    // Consultations — medical records, clinical staff only
+    Route::middleware('role:medical')->group(function () {
+        Route::get('/consultations', [ConsultationController::class, 'index'])->name('consultations.index');
+        Route::get('/consultations/create', [ConsultationController::class, 'create'])->name('consultations.create');
+        Route::post('/consultations/store', [ConsultationController::class, 'store'])->name('consultations.store');
+        Route::get('/consultations/{id}/edit', [ConsultationController::class, 'edit'])->name('consultations.edit');
+        Route::put('/consultations/{id}/update', [ConsultationController::class, 'update'])->name('consultations.update');
+        Route::delete('/consultations/delete/{id}', [ConsultationController::class, 'destroy'])->name('consultations.delete');
+    });
 
-    // Ordonnances
-    Route::get('/prescriptions', [OrdonnancesController::class, 'index'])->name('prescriptions.index');
-    Route::get('/prescriptions/create', [OrdonnancesController::class, 'create'])->name('prescriptions.create');
-    Route::post('/prescriptions/store', [OrdonnancesController::class, 'store'])->name('prescriptions.store');
-    Route::get('/prescriptions/{id}/edit', [OrdonnancesController::class, 'edit'])->name('prescriptions.edit');
-    Route::put('/prescriptions/{id}/update', [OrdonnancesController::class, 'update'])->name('prescriptions.update');
-    Route::delete('/prescriptions/delete/{id}', [OrdonnancesController::class, 'destroy'])->name('prescriptions.delete');
+    // Ordonnances — prescriptions, clinical staff only
+    Route::middleware('role:medical')->group(function () {
+        Route::get('/prescriptions', [OrdonnancesController::class, 'index'])->name('prescriptions.index');
+        Route::get('/prescriptions/create', [OrdonnancesController::class, 'create'])->name('prescriptions.create');
+        Route::post('/prescriptions/store', [OrdonnancesController::class, 'store'])->name('prescriptions.store');
+        Route::get('/prescriptions/{id}/edit', [OrdonnancesController::class, 'edit'])->name('prescriptions.edit');
+        Route::put('/prescriptions/{id}/update', [OrdonnancesController::class, 'update'])->name('prescriptions.update');
+        Route::delete('/prescriptions/delete/{id}', [OrdonnancesController::class, 'destroy'])->name('prescriptions.delete');
+    });
 
-    // Factures
-    Route::get('/billing', [FacturesController::class, 'index'])->name('billing.index');
-    Route::get('/billing/create', [FacturesController::class, 'create'])->name('billing.create');
-    Route::post('/billing/store', [FacturesController::class, 'store'])->name('billing.store');
-    Route::get('/billing/{id}/edit', [FacturesController::class, 'edit'])->name('billing.edit');
-    Route::put('/billing/{id}/update', [FacturesController::class, 'update'])->name('billing.update');
-    Route::put('/billing/{id}/mark-paid', [FacturesController::class, 'markPaid'])->name('billing.markPaid');
-    Route::delete('/billing/delete/{id}', [FacturesController::class, 'destroy'])->name('billing.delete');
+    // Factures — billing, administrative/support staff only
+    Route::middleware('role:support')->group(function () {
+        Route::get('/billing', [FacturesController::class, 'index'])->name('billing.index');
+        Route::get('/billing/create', [FacturesController::class, 'create'])->name('billing.create');
+        Route::post('/billing/store', [FacturesController::class, 'store'])->name('billing.store');
+        Route::get('/billing/{id}/edit', [FacturesController::class, 'edit'])->name('billing.edit');
+        Route::put('/billing/{id}/update', [FacturesController::class, 'update'])->name('billing.update');
+        Route::put('/billing/{id}/mark-paid', [FacturesController::class, 'markPaid'])->name('billing.markPaid');
+        Route::delete('/billing/delete/{id}', [FacturesController::class, 'destroy'])->name('billing.delete');
+    });
 
     // Mon Compte
     Route::get('/account', [AccountController::class, 'index'])->name('account.index');
+    Route::put('/account/update', [AccountController::class, 'update'])->name('account.update');
+    Route::put('/account/password', [AccountController::class, 'updatePassword'])->name('account.password');
+
+    // Utilisateurs — account/login management, admin only
+    Route::middleware('role')->group(function () {
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+        Route::post('/users/store', [UserController::class, 'store'])->name('users.store');
+        Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{id}/update', [UserController::class, 'update'])->name('users.update');
+        Route::put('/users/{id}/reset-password', [UserController::class, 'resetPassword'])->name('users.resetPassword');
+        Route::delete('/users/delete/{id}', [UserController::class, 'destroy'])->name('users.delete');
+    });
 
     // Notifications
     Route::prefix('notifications')->name('notifications.')->group(function () {

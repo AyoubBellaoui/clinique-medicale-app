@@ -2418,6 +2418,7 @@
                 <span class="nav-badge">{{ \App\Models\Patient::count() }}</span>
             </a>
 
+            @if(auth()->user()->isAdmin())
             <a href="{{ route('staff.index') }}" class="nav-item {{ request()->routeIs('staff*') ? 'active' : '' }}">
                 <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0M12 12.75h.008v.008H12v-.008z" />
@@ -2425,6 +2426,7 @@
                 <span class="nav-label">Staff Médical</span>
                 <span class="nav-badge">{{ \App\Models\StaffMedical::count() }}</span>
             </a>
+            @endif
 
             <a href="{{ route('fileAttente.index') }}" class="nav-item {{ request()->routeIs('fileAttente*') ? 'active' : '' }}">
                 <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
@@ -2434,6 +2436,7 @@
                 <span class="nav-badge warn">{{ \App\Models\FileAttente::count() }}</span>
             </a>
 
+            @if(auth()->user()->isAdmin() || auth()->user()->isMedical())
             <a href="{{ route('consultations.index') }}" class="nav-item {{ request()->routeIs('consultations*') ? 'active' : '' }}">
                 <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
@@ -2447,14 +2450,17 @@
                 </svg>
                 <span class="nav-label">Ordonnances</span>
             </a>
+            @endif
 
+            @if(auth()->user()->isAdmin() || auth()->user()->isSupport())
             <a href="{{ route('billing.index') }}" class="nav-item {{ request()->routeIs('billing*') ? 'active' : '' }}">
                 <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 <span class="nav-label">Factures</span>
-                <span class="nav-badge">0</span>
+                <span class="nav-badge">{{ \App\Models\Facture::count() }}</span>
             </a>
+            @endif
 
             <div class="nav-section-label">Paramètres</div>
 
@@ -2464,6 +2470,16 @@
                 </svg>
                 <span class="nav-label">Mon Compte</span>
             </a>
+
+            @if(auth()->user()->isAdmin())
+            <a href="{{ route('users.index') }}" class="nav-item {{ request()->routeIs('users*') ? 'active' : '' }}">
+                <svg class="nav-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                </svg>
+                <span class="nav-label">Utilisateurs</span>
+                <span class="nav-badge">{{ \App\Models\User::count() }}</span>
+            </a>
+            @endif
         </nav>
 
         <div class="sidebar-footer">

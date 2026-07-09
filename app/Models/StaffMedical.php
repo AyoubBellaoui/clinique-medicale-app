@@ -56,6 +56,11 @@ class StaffMedical extends Model
         return $this->hasMany(FileAttente::class, 'staff_id', 'id');
     }
 
+    public function user()
+    {
+        return $this->hasOne(User::class, 'staff_id', 'id');
+    }
+
     /* ===================== ACCESSORS ===================== */
 
     public function getFullNameAttribute(): string

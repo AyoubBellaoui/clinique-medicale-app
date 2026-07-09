@@ -6,6 +6,12 @@
 
 @section('content')
 
+@php
+    $moisFr = [1=>'Janvier',2=>'Février',3=>'Mars',4=>'Avril',5=>'Mai',6=>'Juin',7=>'Juillet',8=>'Août',9=>'Septembre',10=>'Octobre',11=>'Novembre',12=>'Décembre'];
+    $roleLabels = ['admin' => 'Administrateur', 'medecin' => 'Médecin', 'infirmier' => 'Infirmier', 'secretariat' => 'Secrétariat', 'technicien' => 'Technicien'];
+    $initials = strtoupper(collect(explode(' ', $user->name))->map(fn($w) => mb_substr($w, 0, 1))->take(2)->implode(''));
+@endphp
+
 <div style="display:grid;grid-template-columns:300px 1fr;gap:22px;align-items:start;">
 
     {{-- Profile card --}}
@@ -15,36 +21,34 @@
         </div>
         <div style="padding:0 20px 20px;text-align:center;">
             <div style="margin-top:-28px;margin-bottom:10px;display:flex;justify-content:center;position:relative;z-index:2;">
-                <div style="width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--teal-400),var(--teal-700));display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;border:3px solid #fff;box-shadow:0 2px 8px rgba(20,90,75,.16);font-family:'Fraunces',serif;">DA</div>
+                <div style="width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--teal-400),var(--teal-700));display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;border:3px solid #fff;box-shadow:0 2px 8px rgba(20,90,75,.16);font-family:'Fraunces',serif;">{{ $initials ?: '?' }}</div>
             </div>
-            <div style="font-size:16px;font-weight:700;color:var(--teal-800);margin-bottom:4px;font-family:'Fraunces',serif;letter-spacing:-.2px;">Dr. Admin</div>
+            <div style="font-size:16px;font-weight:700;color:var(--teal-800);margin-bottom:4px;font-family:'Fraunces',serif;letter-spacing:-.2px;">{{ $user->name }}</div>
             <div style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--teal-600);font-weight:600;background:rgba(52,168,140,.07);padding:3px 10px;border-radius:999px;border:1px solid rgba(52,168,140,.12);margin-bottom:16px;">
                 <span style="width:6px;height:6px;border-radius:50%;background:var(--teal-500);display:inline-block;"></span>
-                Administrateur
+                {{ $roleLabels[$user->role] ?? ucfirst($user->role) }}
             </div>
 
             <div style="display:flex;border:1px solid rgba(52,168,140,.1);border-radius:10px;overflow:hidden;margin-bottom:14px;">
                 <div style="flex:1;padding:12px 6px;text-align:center;border-right:1px solid rgba(52,168,140,.1);">
-                    <div style="font-size:17px;font-weight:700;color:var(--teal-700);font-family:'Fraunces',serif;">6</div>
+                    <div style="font-size:17px;font-weight:700;color:var(--teal-700);font-family:'Fraunces',serif;">{{ $consultationsCount }}</div>
                     <div style="font-size:9px;color:var(--soft);font-weight:700;text-transform:uppercase;letter-spacing:.09em;margin-top:2px;">Consult.</div>
                 </div>
                 <div style="flex:1;padding:12px 6px;text-align:center;border-right:1px solid rgba(52,168,140,.1);">
-                    <div style="font-size:17px;font-weight:700;color:var(--teal-700);font-family:'Fraunces',serif;">9</div>
+                    <div style="font-size:17px;font-weight:700;color:var(--teal-700);font-family:'Fraunces',serif;">{{ $patientsCount }}</div>
                     <div style="font-size:9px;color:var(--soft);font-weight:700;text-transform:uppercase;letter-spacing:.09em;margin-top:2px;">Patients</div>
                 </div>
                 <div style="flex:1;padding:12px 6px;text-align:center;">
-                    <div style="font-size:17px;font-weight:700;color:var(--teal-700);font-family:'Fraunces',serif;">6</div>
+                    <div style="font-size:17px;font-weight:700;color:var(--teal-700);font-family:'Fraunces',serif;">{{ $staffCount }}</div>
                     <div style="font-size:9px;color:var(--soft);font-weight:700;text-transform:uppercase;letter-spacing:.09em;margin-top:2px;">Staff</div>
                 </div>
             </div>
 
-            <div style="display:flex;flex-direction:column;border:1px solid rgba(52,168,140,.1);border-radius:10px;overflow:hidden;margin-bottom:14px;text-align:left;">
+            <div style="display:flex;flex-direction:column;border:1px solid rgba(52,168,140,.1);border-radius:10px;overflow:hidden;text-align:left;">
                 @php
                 $infos = [
-                    ['icon'=>'M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75','label'=>'Email','value'=>'admin@clinicpro.ma'],
-                    ['icon'=>'M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z','label'=>'Téléphone','value'=>'+212 6 61 23 45 67'],
-                    ['icon'=>'M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75','label'=>'Membre depuis','value'=>'Janvier 2024'],
-                    ['icon'=>'M15 10.5a3 3 0 11-6 0 3 3 0 016 0zM19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z','label'=>'Localisation','value'=>'Casablanca, Maroc'],
+                    ['icon'=>'M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75','label'=>'Email','value'=>$user->email],
+                    ['icon'=>'M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75','label'=>'Membre depuis','value'=>$moisFr[$user->created_at->month].' '.$user->created_at->year],
                 ];
                 @endphp
                 @foreach($infos as $info)
@@ -58,17 +62,6 @@
                     </div>
                 </div>
                 @endforeach
-            </div>
-
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                <button style="display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;background:var(--teal-600);color:#fff;border:none;">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"/><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z"/></svg>
-                    Photo
-                </button>
-                <button style="display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;border-radius:9px;font-size:12px;font-weight:600;cursor:pointer;background:none;color:var(--teal-700);border:1px solid rgba(52,168,140,.2);">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"/></svg>
-                    Partager
-                </button>
             </div>
         </div>
     </div>
@@ -87,88 +80,99 @@
 
         {{-- Tab: Profil --}}
         <div class="account-panel" id="panel-profile">
-            <div style="background:#fff;border-radius:16px;border:1px solid rgba(52,168,140,.1);box-shadow:var(--shadow);overflow:hidden;">
-                <div style="padding:18px 22px;border-bottom:1px solid rgba(52,168,140,.08);">
-                    <h3 style="font-size:15px;font-weight:700;color:var(--teal-800);font-family:'Fraunces',serif;">Informations personnelles</h3>
-                    <p style="font-size:12px;color:var(--soft);margin-top:2px;">Mettez à jour votre nom et votre email</p>
-                </div>
-                <div style="padding:22px;">
-                    <div class="form-grid">
-                        <div class="form-group"><label class="form-label">Nom complet</label><input class="form-input" value="Dr. Admin"></div>
-                        <div class="form-group"><label class="form-label">Titre</label><input class="form-input" value="Administrateur"></div>
-                        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" value="admin@clinicpro.ma"></div>
-                        <div class="form-group"><label class="form-label">Téléphone</label><input class="form-input" value="+212 6 61 23 45 67"></div>
-                        <div class="form-group full"><label class="form-label">Bio</label><textarea class="form-textarea" rows="3">Administrateur principal de ClinicPro depuis janvier 2024.</textarea></div>
+            <form action="{{ route('account.update') }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div style="background:#fff;border-radius:16px;border:1px solid rgba(52,168,140,.1);box-shadow:var(--shadow);overflow:hidden;">
+                    <div style="padding:18px 22px;border-bottom:1px solid rgba(52,168,140,.08);">
+                        <h3 style="font-size:15px;font-weight:700;color:var(--teal-800);font-family:'Fraunces',serif;">Informations personnelles</h3>
+                        <p style="font-size:12px;color:var(--soft);margin-top:2px;">Mettez à jour votre nom et votre email</p>
                     </div>
-                    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;">
-                        <button class="btn btn-ghost">Annuler</button>
-                        <button class="btn btn-primary">
-                            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            Enregistrer
-                        </button>
+                    <div style="padding:22px;">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Nom complet</label>
+                                <input name="name" class="form-input @error('name') input-error @enderror" value="{{ old('name', $user->getRawOriginal('name')) }}" placeholder="{{ $user->name }}">
+                                @error('name')<div class="field-error">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Rôle</label>
+                                <input class="form-input" value="{{ $roleLabels[$user->role] ?? ucfirst($user->role) }}" disabled style="opacity:.6;cursor:not-allowed;">
+                            </div>
+                            <div class="form-group full">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="email" class="form-input @error('email') input-error @enderror" value="{{ old('email', $user->email) }}">
+                                @error('email')<div class="field-error">{{ $message }}</div>@enderror
+                            </div>
+                        </div>
+                        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;">
+                            <button type="submit" class="btn btn-primary">
+                                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                Enregistrer
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
 
         {{-- Tab: Sécurité --}}
         <div class="account-panel hidden" id="panel-security">
-            <div style="background:#fff;border-radius:16px;border:1px solid rgba(52,168,140,.1);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px;">
-                <div style="padding:18px 22px;border-bottom:1px solid rgba(52,168,140,.08);">
-                    <h3 style="font-size:15px;font-weight:700;color:var(--teal-800);font-family:'Fraunces',serif;">Changer le mot de passe</h3>
-                    <p style="font-size:12px;color:var(--soft);margin-top:2px;">Utilisez un mot de passe fort et unique</p>
-                </div>
-                <div style="padding:22px;">
-                    <div class="form-grid">
-                        <div class="form-group full">
-                            <label class="form-label">Mot de passe actuel</label>
-                            <div style="position:relative;">
-                                <input type="password" class="form-input" placeholder="••••••••" style="width:100%;padding-right:38px;">
-                                <button type="button" class="account-toggle-pw" onclick="toggleAccountPw(this)" tabindex="-1">
-                                    <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    </svg>
-                                </button>
+            <form action="{{ route('account.password') }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div style="background:#fff;border-radius:16px;border:1px solid rgba(52,168,140,.1);box-shadow:var(--shadow);overflow:hidden;">
+                    <div style="padding:18px 22px;border-bottom:1px solid rgba(52,168,140,.08);">
+                        <h3 style="font-size:15px;font-weight:700;color:var(--teal-800);font-family:'Fraunces',serif;">Changer le mot de passe</h3>
+                        <p style="font-size:12px;color:var(--soft);margin-top:2px;">Utilisez un mot de passe fort et unique</p>
+                    </div>
+                    <div style="padding:22px;">
+                        <div class="form-grid">
+                            <div class="form-group full">
+                                <label class="form-label">Mot de passe actuel</label>
+                                <div style="position:relative;">
+                                    <input type="password" name="current_password" class="form-input @error('current_password') input-error @enderror" placeholder="••••••••" style="width:100%;padding-right:38px;">
+                                    <button type="button" class="account-toggle-pw" onclick="toggleAccountPw(this)" tabindex="-1">
+                                        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                @error('current_password')<div class="field-error">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Nouveau mot de passe</label>
+                                <div style="position:relative;">
+                                    <input type="password" name="password" class="form-input @error('password') input-error @enderror" placeholder="Min. 8 caractères" style="width:100%;padding-right:38px;">
+                                    <button type="button" class="account-toggle-pw" onclick="toggleAccountPw(this)" tabindex="-1">
+                                        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                                @error('password')<div class="field-error">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Confirmer</label>
+                                <div style="position:relative;">
+                                    <input type="password" name="password_confirmation" class="form-input" placeholder="Confirmer" style="width:100%;padding-right:38px;">
+                                    <button type="button" class="account-toggle-pw" onclick="toggleAccountPw(this)" tabindex="-1">
+                                        <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Nouveau mot de passe</label>
-                            <div style="position:relative;">
-                                <input type="password" class="form-input" placeholder="Min. 8 caractères" style="width:100%;padding-right:38px;">
-                                <button type="button" class="account-toggle-pw" onclick="toggleAccountPw(this)" tabindex="-1">
-                                    <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Confirmer</label>
-                            <div style="position:relative;">
-                                <input type="password" class="form-input" placeholder="Confirmer" style="width:100%;padding-right:38px;">
-                                <button type="button" class="account-toggle-pw" onclick="toggleAccountPw(this)" tabindex="-1">
-                                    <svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    </svg>
-                                </button>
-                            </div>
+                        <div style="display:flex;justify-content:flex-end;margin-top:20px;">
+                            <button type="submit" class="btn btn-primary">Mettre à jour</button>
                         </div>
                     </div>
-                    <div style="display:flex;justify-content:flex-end;margin-top:20px;">
-                        <button class="btn btn-primary">Mettre à jour</button>
-                    </div>
                 </div>
-            </div>
-            <div style="background:rgba(244,63,94,.04);border:1px solid rgba(244,63,94,.15);border-radius:12px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
-                <div>
-                    <p style="font-size:13px;font-weight:600;color:#e11d48;">Supprimer mon compte</p>
-                    <span style="font-size:11.5px;color:#fb7185;">Toutes vos données seront définitivement effacées.</span>
-                </div>
-                <button class="btn btn-danger btn-sm">Supprimer</button>
-            </div>
+            </form>
         </div>
 
         {{-- Tab: Préférences --}}
@@ -245,6 +249,7 @@
 .account-toggle-pw:hover { color:var(--teal-600); }
 html.dark .account-toggle-pw { color:#4d8a7e; }
 html.dark .account-toggle-pw:hover { color:#7ecab5; }
+.field-error{font-size:11.5px;color:#e11d48;margin-top:5px;font-weight:600;}
 </style>
 @endpush
 
