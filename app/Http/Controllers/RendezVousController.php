@@ -7,6 +7,8 @@ use App\Models\RendezVous;
 use App\Models\StaffMedical;
 use App\Notifications\ClinicNotification;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class RendezVousController extends Controller
 {
@@ -46,7 +48,15 @@ class RendezVousController extends Controller
             'patient_id'         => 'required|exists:patients,id',
             'staff_id'           => 'required|exists:staff_medicals,id',
             'date'                => 'required|date|after_or_equal:today',
-            'heure'               => 'required|date_format:H:i',
+            'heure'               => [
+                'required',
+                'date_format:H:i',
+                Rule::unique('rendez_vous', 'heure')->where(function ($query) use ($request) {
+                    return $query->where('staff_id', $request->staff_id)
+                        ->where('date', $request->date)
+                        ->where('statut', '!=', 'annule');
+                }),
+            ],
             'type_consultation'   => 'required|in:standard,suivi,urgence,controle_post_operatoire,bilan_complet',
             'duree'               => 'required|integer|in:15,30,45,60,90',
             'motif'               => 'nullable|string|max:255',
@@ -65,6 +75,7 @@ class RendezVousController extends Controller
 
             'heure.required'    => "L'heure est obligatoire.",
             'heure.date_format' => 'Heure invalide.',
+            'heure.unique'       => 'Ce médecin a déjà un rendez-vous à cette heure ce jour-là.',
 
             'type_consultation.required' => 'Le type de consultation est obligatoire.',
             'type_consultation.in'       => 'Type de consultation invalide.',
@@ -79,6 +90,12 @@ class RendezVousController extends Controller
 
             'notes.max' => 'Max 1000 caractères.',
         ]);
+
+        if ($validated['date'] === today()->format('Y-m-d') && $validated['heure'] < now()->format('H:i')) {
+            throw ValidationException::withMessages([
+                'heure' => "L'heure sélectionnée est déjà passée pour aujourd'hui.",
+            ]);
+        }
 
         $appointment = RendezVous::create($validated);
 
@@ -127,7 +144,15 @@ class RendezVousController extends Controller
             'patient_id'         => 'required|exists:patients,id',
             'staff_id'           => 'required|exists:staff_medicals,id',
             'date'                => 'required|date',
-            'heure'               => 'required|date_format:H:i',
+            'heure'               => [
+                'required',
+                'date_format:H:i',
+                Rule::unique('rendez_vous', 'heure')->ignore($appointment->id)->where(function ($query) use ($request) {
+                    return $query->where('staff_id', $request->staff_id)
+                        ->where('date', $request->date)
+                        ->where('statut', '!=', 'annule');
+                }),
+            ],
             'statut'              => 'required|in:programme,confirme,annule,termine',
             'type_consultation'   => 'required|in:standard,suivi,urgence,controle_post_operatoire,bilan_complet',
             'duree'               => 'required|integer|in:15,30,45,60,90',
@@ -146,6 +171,7 @@ class RendezVousController extends Controller
 
             'heure.required'    => "L'heure est obligatoire.",
             'heure.date_format' => 'Heure invalide.',
+            'heure.unique'       => 'Ce médecin a déjà un rendez-vous à cette heure ce jour-là.',
 
             'statut.required' => 'Le statut est obligatoire.',
             'statut.in'        => 'Statut invalide.',
