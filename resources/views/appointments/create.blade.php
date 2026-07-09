@@ -31,10 +31,10 @@
         <div style="padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:18px;">
             <div class="form-group" style="grid-column:1/-1;">
                 <label class="form-label">Patient <span style="color:#f43f5e;">*</span></label>
-                <select class="form-control form-select @error('patient_id') input-error @enderror" name="patient_id">
+                <select class="form-control form-select @error('patient_id') input-error @enderror" name="patient_id" id="patient_select" onchange="onPatientChange()">
                     <option value="">— Sélectionner un patient —</option>
                     @foreach($patients as $p)
-                        <option value="{{ $p->id }}" {{ old('patient_id') == $p->id ? 'selected' : '' }}>
+                        <option value="{{ $p->id }}" data-medecin="{{ $p->medecin_id }}" {{ old('patient_id') == $p->id ? 'selected' : '' }}>
                             {{ $p->full_name }} @if($p->cin) (CIN: {{ $p->cin }}) @endif
                         </option>
                     @endforeach
@@ -43,7 +43,7 @@
             </div>
             <div class="form-group">
                 <label class="form-label">Médecin <span style="color:#f43f5e;">*</span></label>
-                <select class="form-control form-select @error('staff_id') input-error @enderror" name="staff_id">
+                <select class="form-control form-select @error('staff_id') input-error @enderror" name="staff_id" id="doctor_select">
                     <option value="">— Sélectionner un médecin —</option>
                     @foreach($doctors as $d)
                         <option value="{{ $d->id }}" {{ old('staff_id') == $d->id ? 'selected' : '' }}>
@@ -196,6 +196,19 @@ function selectSlot(btn, time) {
     document.querySelectorAll('.slot-active').forEach(b => b.classList.remove('slot-active'));
     btn.classList.add('slot-active');
     document.querySelector('[name="heure"]').value = time;
+}
+
+function onPatientChange() {
+    const patSel = document.getElementById('patient_select');
+    const opt = patSel.options[patSel.selectedIndex];
+    const medecinId = opt?.dataset.medecin;
+
+    if (medecinId) {
+        const docSel = document.getElementById('doctor_select');
+        if ([...docSel.options].some(o => o.value === medecinId)) {
+            docSel.value = medecinId;
+        }
+    }
 }
 </script>
 @endpush

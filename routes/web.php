@@ -46,10 +46,10 @@ Route::middleware('auth')->group(function () {
     // File d'attente
     Route::get('/fileAttente', [FileAttenteController::class, 'index'])->name('fileAttente.index');
     Route::get('/fileAttente/create', [FileAttenteController::class, 'create'])->name('fileAttente.create');
-    Route::post('/fileAttente/store', [FileAttenteController::class, 'store'])->name('FileAttente.store');
-    Route::get('/fileAttente/{id}/edit', [FileAttenteController::class, 'edit'])->name('FileAttente.edit');
-    Route::put('/fileAttente/{id}/update', [FileAttenteController::class, 'update'])->name('FileAttente.update');
-    Route::delete('/fileAttente/delete/{id}', [FileAttenteController::class, 'destroy'])->name('FileAttente.delete');
+    Route::post('/fileAttente/store', [FileAttenteController::class, 'store'])->name('fileAttente.store');
+    Route::get('/fileAttente/{id}/edit', [FileAttenteController::class, 'edit'])->name('fileAttente.edit');
+    Route::put('/fileAttente/{id}/update', [FileAttenteController::class, 'update'])->name('fileAttente.update');
+    Route::delete('/fileAttente/delete/{id}', [FileAttenteController::class, 'destroy'])->name('fileAttente.delete');
 
     // Rendez-vous
     Route::get('/appointments', [RendezVousController::class, 'index'])->name('appointments.index');
