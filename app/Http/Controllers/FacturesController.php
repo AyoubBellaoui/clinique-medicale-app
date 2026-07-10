@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Consultation;
 use App\Models\Facture;
+use App\Models\FileAttente;
 use App\Models\Patient;
 use App\Models\StaffMedical;
 use App\Notifications\ClinicNotification;
@@ -172,6 +173,10 @@ class FacturesController extends Controller
 
         $this->syncLignes($facture, $validated['services']);
 
+        if ($becamePaid) {
+            $this->terminateLinkedQueueEntry($facture);
+        }
+
         ClinicNotification::broadcast(
             'facture', "Facture mise à jour : {$facture->numero} — {$facture->patient->full_name}",
             'edit', 'blue', route('billing.index')
@@ -192,6 +197,8 @@ class FacturesController extends Controller
         if ($facture->statut !== 'paye') {
             $facture->update(['statut' => 'paye', 'paid_at' => now()]);
 
+            $this->terminateLinkedQueueEntry($facture);
+
             ClinicNotification::broadcast(
                 'facture', "Facture réglée : {$facture->numero} — {$facture->patient->full_name}",
                 'check', 'green', route('billing.index')
@@ -201,6 +208,22 @@ class FacturesController extends Controller
         }
 
         return redirect()->route('billing.index');
+    }
+
+    /**
+     * When a facture tied to a consultation is settled, the patient's visit is
+     * fully closed out (rdv -> file d'attente -> consultation -> facture), so the
+     * originating queue entry can move from "en_cours" to "termine" automatically.
+     */
+    private function terminateLinkedQueueEntry(Facture $facture): void
+    {
+        $fileAttenteId = $facture->consultation?->file_attente_id;
+
+        if (!$fileAttenteId) {
+            return;
+        }
+
+        FileAttente::find($fileAttenteId)?->terminer();
     }
 
     /**

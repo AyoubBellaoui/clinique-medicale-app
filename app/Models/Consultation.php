@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Consultation extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'date_consultation',
         'motif',
@@ -27,6 +30,7 @@ class Consultation extends Model
         'prochain_rdv_date',
         'patient_id',
         'staff_id',
+        'file_attente_id',
     ];
 
     protected $casts = [
@@ -53,5 +57,10 @@ class Consultation extends Model
     public function ordonnance()
     {
         return $this->hasOne(Ordonnance::class);
+    }
+
+    public function fileAttente()
+    {
+        return $this->belongsTo(FileAttente::class);
     }
 }

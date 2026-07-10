@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Consultation;
+use App\Models\FileAttente;
 use App\Models\Patient;
 use App\Models\RendezVous;
 use App\Models\StaffMedical;
@@ -34,7 +35,7 @@ class ConsultationController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
         $patients = Patient::orderBy('nom')->get();
 
@@ -42,7 +43,11 @@ class ConsultationController extends Controller
             ->orderBy('nom')
             ->get();
 
-        return view('consultations.create', compact('patients', 'doctors'));
+        $fileAttenteEntry = $request->query('fa')
+            ? FileAttente::find($request->query('fa'))
+            : null;
+
+        return view('consultations.create', compact('patients', 'doctors', 'fileAttenteEntry'));
     }
 
     /**
@@ -59,7 +64,19 @@ class ConsultationController extends Controller
             $validated[$flag] = $request->boolean($flag);
         }
 
+        if (empty($validated['file_attente_id'])) {
+            $validated['file_attente_id'] = $this->matchTodaysQueueEntry($validated['patient_id']);
+        }
+
         $consultation = Consultation::create($validated);
+
+        if ($consultation->file_attente_id) {
+            $entry = FileAttente::find($consultation->file_attente_id);
+
+            if ($entry && $entry->statut === 'en_attente') {
+                $entry->update(['statut' => 'en_cours']);
+            }
+        }
 
         ClinicNotification::broadcast(
             'consultation', "Nouvelle consultation : {$consultation->patient->full_name} avec Dr. {$consultation->staff->full_name}",
@@ -149,6 +166,21 @@ class ConsultationController extends Controller
     }
 
     /**
+     * When a consultation is filed for a patient without going through the "Consultation"
+     * button on the queue (e.g. the plain "Nouvelle consultation" menu entry), still pick up
+     * that patient's active queue entry for today so it isn't left stuck on "en_cours".
+     * Historical/backdated consultations naturally won't match anything and stay unlinked.
+     */
+    private function matchTodaysQueueEntry(int $patientId): ?int
+    {
+        return FileAttente::where('patient_id', $patientId)
+            ->whereDate('arrived_at', today())
+            ->where('statut', 'en_cours')
+            ->whereDoesntHave('consultation')
+            ->value('id');
+    }
+
+    /**
      * Shared validation rules for store() and update().
      */
     private function validateConsultation(Request $request): array
@@ -156,6 +188,7 @@ class ConsultationController extends Controller
         return $request->validate([
             'patient_id'          => 'required|exists:patients,id',
             'staff_id'            => 'required|exists:staff_medicals,id',
+            'file_attente_id'     => 'nullable|exists:file_attentes,id',
             'date'                => 'required|date|before_or_equal:today',
             'heure'               => 'required|date_format:H:i',
             'type_consultation'   => 'required|in:standard,suivi,urgence,controle_post_operatoire,bilan_complet',

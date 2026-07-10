@@ -53,7 +53,7 @@ class RendezVousController extends Controller
                 'date_format:H:i',
                 Rule::unique('rendez_vous', 'heure')->where(function ($query) use ($request) {
                     return $query->where('staff_id', $request->staff_id)
-                        ->where('date', $request->date)
+                        ->whereDate('date', $request->date)
                         ->where('statut', '!=', 'annule');
                 }),
             ],
@@ -149,7 +149,7 @@ class RendezVousController extends Controller
                 'date_format:H:i',
                 Rule::unique('rendez_vous', 'heure')->ignore($appointment->id)->where(function ($query) use ($request) {
                     return $query->where('staff_id', $request->staff_id)
-                        ->where('date', $request->date)
+                        ->whereDate('date', $request->date)
                         ->where('statut', '!=', 'annule');
                 }),
             ],

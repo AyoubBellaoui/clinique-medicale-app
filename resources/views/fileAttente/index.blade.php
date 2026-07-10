@@ -182,7 +182,12 @@
                                     <button type="submit" class="btn btn-primary btn-sm">En cours</button>
                                 </form>
                             @elseif($entry->statut === 'en_cours')
-                                <form method="POST" action="{{ route('fileAttente.update', $entry->id) }}" style="display:inline;">
+                                @if(!$entry->consultation)
+                                    <a href="{{ route('consultations.create', ['fa' => $entry->id]) }}" class="btn btn-primary btn-sm">Consultation</a>
+                                @else
+                                    <span class="badge badge-blue" title="Se termine automatiquement au règlement de la facture">Consultation en cours</span>
+                                @endif
+                                <form method="POST" action="{{ route('fileAttente.update', $entry->id) }}" style="display:inline;" onsubmit="return confirm('Terminer manuellement cette entrée sans passer par la facturation ?')">
                                     @csrf @method('PUT')
                                     <input type="hidden" name="patient_id" value="{{ $entry->patient_id }}">
                                     <input type="hidden" name="staff_id" value="{{ $entry->staff_id }}">
@@ -190,7 +195,7 @@
                                     <input type="hidden" name="type_visite" value="{{ $entry->type_visite }}">
                                     <input type="hidden" name="motif" value="{{ $entry->motif }}">
                                     <input type="hidden" name="statut" value="termine">
-                                    <button type="submit" class="btn btn-success btn-sm">✓ Terminer</button>
+                                    <button type="submit" class="btn btn-outline btn-sm" title="Terminer manuellement">✓ Terminer</button>
                                 </form>
                             @endif
                             <a href="{{ route('fileAttente.edit', $entry->id) }}" class="btn btn-outline btn-sm btn-icon-only" title="Modifier">

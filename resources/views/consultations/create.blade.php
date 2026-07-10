@@ -14,6 +14,15 @@
 
 <form action="{{ route('consultations.store') }}" method="POST">
     @csrf
+    @if($fileAttenteEntry)
+        <input type="hidden" name="file_attente_id" value="{{ $fileAttenteEntry->id }}">
+        <div class="card" style="margin-bottom:16px;padding:14px 20px;background:rgba(52,168,140,.08);border:1.5px solid rgba(52,168,140,.25);display:flex;align-items:center;gap:10px;">
+            <svg width="16" height="16" fill="none" stroke="var(--teal-600)" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+            <span style="font-size:13px;font-weight:600;color:var(--teal-800);">
+                Consultation démarrée depuis la file d'attente — {{ $fileAttenteEntry->patient->full_name }}. À l'enregistrement, cette entrée passera automatiquement à « terminé » lorsque la facture sera payée.
+            </span>
+        </div>
+    @endif
 
     {{-- Patient & Doctor --}}
     <div class="card" style="margin-bottom:16px;overflow:hidden;">
@@ -31,26 +40,32 @@
         <div style="padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:18px;">
             <div class="form-group">
                 <label class="form-label">Patient <span style="color:#f43f5e;">*</span></label>
-                <select class="form-control form-select @error('patient_id') input-error @enderror" name="patient_id">
+                <select class="form-control form-select @error('patient_id') input-error @enderror" name="patient_id" {{ $fileAttenteEntry ? 'disabled' : '' }}>
                     <option value="">— Sélectionner un patient —</option>
                     @foreach($patients as $p)
-                        <option value="{{ $p->id }}" {{ old('patient_id') == $p->id ? 'selected' : '' }}>
+                        <option value="{{ $p->id }}" {{ old('patient_id', $fileAttenteEntry->patient_id ?? null) == $p->id ? 'selected' : '' }}>
                             {{ $p->full_name }} @if($p->cin) (CIN: {{ $p->cin }}) @endif
                         </option>
                     @endforeach
                 </select>
+                @if($fileAttenteEntry)
+                    <input type="hidden" name="patient_id" value="{{ $fileAttenteEntry->patient_id }}">
+                @endif
                 @error('patient_id')<div class="field-error">{{ $message }}</div>@enderror
             </div>
             <div class="form-group">
                 <label class="form-label">Médecin <span style="color:#f43f5e;">*</span></label>
-                <select class="form-control form-select @error('staff_id') input-error @enderror" name="staff_id">
+                <select class="form-control form-select @error('staff_id') input-error @enderror" name="staff_id" {{ $fileAttenteEntry ? 'disabled' : '' }}>
                     <option value="">— Sélectionner un médecin —</option>
                     @foreach($doctors as $d)
-                        <option value="{{ $d->id }}" {{ old('staff_id') == $d->id ? 'selected' : '' }}>
+                        <option value="{{ $d->id }}" {{ old('staff_id', $fileAttenteEntry->staff_id ?? null) == $d->id ? 'selected' : '' }}>
                             Dr. {{ $d->full_name }} @if($d->specialite) — {{ $d->specialite }} @endif
                         </option>
                     @endforeach
                 </select>
+                @if($fileAttenteEntry)
+                    <input type="hidden" name="staff_id" value="{{ $fileAttenteEntry->staff_id }}">
+                @endif
                 @error('staff_id')<div class="field-error">{{ $message }}</div>@enderror
             </div>
             <div class="form-group">

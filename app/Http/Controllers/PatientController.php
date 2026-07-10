@@ -43,6 +43,7 @@ class PatientController extends Controller
             'cin'            => 'required|string|max:20|unique:patients,cin',
             'date_naissance' => 'nullable|date|before:today',
             'genre'          => 'nullable|in:M,F',
+            'statut_marital' => 'nullable|in:celibataire,marie,divorce,veuf',
             'groupe_sanguin' => 'nullable|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
             'telephone'      => 'nullable|string|max:20',
             'email'          => 'nullable|email|unique:patients,email',
@@ -82,6 +83,7 @@ class PatientController extends Controller
             'date_naissance.date'   => 'Date de naissance invalide.',
             'date_naissance.before' => 'La date de naissance doit être dans le passé.',
             'genre.in'              => 'Sexe invalide.',
+            'statut_marital.in'     => 'Statut marital invalide.',
             'groupe_sanguin.in'     => 'Groupe sanguin invalide.',
 
             // contact
@@ -158,6 +160,7 @@ class PatientController extends Controller
             'cin'            => 'required|string|max:20|unique:patients,cin,' . $id,
             'date_naissance' => 'nullable|date|before:today',
             'genre'          => 'nullable|in:M,F',
+            'statut_marital' => 'nullable|in:celibataire,marie,divorce,veuf',
             'groupe_sanguin' => 'nullable|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
             'telephone'      => 'nullable|string|max:20',
             // BUG FIX: same issue for email — ignore the current patient's own row.
@@ -198,6 +201,7 @@ class PatientController extends Controller
             'date_naissance.date'   => 'Date de naissance invalide.',
             'date_naissance.before' => 'La date de naissance doit être dans le passé.',
             'genre.in'              => 'Sexe invalide.',
+            'statut_marital.in'     => 'Statut marital invalide.',
             'groupe_sanguin.in'     => 'Groupe sanguin invalide.',
 
             // contact

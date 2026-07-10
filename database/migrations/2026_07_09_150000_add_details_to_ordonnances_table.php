@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -32,8 +31,10 @@ return new class extends Migration
             $table->text('notes_privees')->nullable()->after('substitution_autorisee');
         });
 
-        DB::statement('ALTER TABLE ordonnances MODIFY consultation_id BIGINT UNSIGNED NULL');
-        DB::statement('ALTER TABLE ordonnances MODIFY contenu TEXT NULL');
+        Schema::table('ordonnances', function (Blueprint $table) {
+            $table->foreignId('consultation_id')->nullable()->change();
+            $table->text('contenu')->nullable()->change();
+        });
     }
 
     /**

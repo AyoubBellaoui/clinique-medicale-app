@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class FileAttente extends Model
 {
+    use HasFactory;
+
     protected $table = 'file_attentes';
 
     protected $fillable = [
@@ -37,5 +40,20 @@ class FileAttente extends Model
     public function rendezVous()
     {
         return $this->belongsTo(RendezVous::class);
+    }
+
+    public function consultation()
+    {
+        return $this->hasOne(Consultation::class);
+    }
+
+    /**
+     * Move this queue entry to "termine", unless it's already terminal (termine/annule).
+     */
+    public function terminer(): void
+    {
+        if (!in_array($this->statut, ['termine', 'annule'], true)) {
+            $this->update(['statut' => 'termine']);
+        }
     }
 }

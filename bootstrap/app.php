@@ -14,6 +14,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureRole::class,
         ]);
+
+        // The login page is the GET route "login.show" (POST "login" is the
+        // form submission target); without this, the framework's default
+        // guest redirect resolves the name "login" and sends guests to the
+        // POST-only URL, which 405s instead of showing the login form.
+        $middleware->redirectGuestsTo(fn () => route('login.show'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

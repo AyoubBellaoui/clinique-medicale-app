@@ -16,10 +16,10 @@ class FileAttenteController extends Controller
      */
     public function index()
     {
-        $fileAttente = FileAttente::with(['patient', 'staff', 'rendezVous'])
+        $fileAttente = FileAttente::with(['patient', 'staff', 'rendezVous', 'consultation'])
             ->whereDate('arrived_at', today())
             ->orderByRaw("CASE WHEN statut IN ('en_attente', 'en_cours') THEN 0 ELSE 1 END")
-            ->orderByRaw("FIELD(priorite, 'urgente', 'haute', 'normale')")
+            ->orderByRaw("CASE priorite WHEN 'urgente' THEN 0 WHEN 'haute' THEN 1 WHEN 'normale' THEN 2 ELSE 3 END")
             ->orderBy('position')
             ->get();
 

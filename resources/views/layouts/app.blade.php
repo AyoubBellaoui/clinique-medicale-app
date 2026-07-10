@@ -1314,6 +1314,16 @@
             color: #7c3aed;
         }
 
+        .activity-icon.teal {
+            background: rgba(52, 168, 140, .1);
+            color: #227a68;
+        }
+
+        .activity-icon.rose {
+            background: rgba(244, 63, 94, .1);
+            color: #e11d48;
+        }
+
         .activity-info {
             flex: 1;
             min-width: 0;
