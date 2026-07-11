@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Ordonnance extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'consultation_id',
         'patient_id',
@@ -28,12 +31,12 @@ class Ordonnance extends Model
 
     public function patient()
     {
-        return $this->belongsTo(Patient::class);
+        return $this->belongsTo(Patient::class)->withTrashed();
     }
 
     public function staff()
     {
-        return $this->belongsTo(StaffMedical::class);
+        return $this->belongsTo(StaffMedical::class)->withTrashed();
     }
 
     public function consultation()

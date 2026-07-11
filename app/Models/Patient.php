@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Consultation> $consultations
@@ -19,7 +20,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Patient extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'patients';
 
@@ -48,7 +49,7 @@ class Patient extends Model
 
     public function medecin()
     {
-        return $this->belongsTo(StaffMedical::class, 'medecin_id', 'id');
+        return $this->belongsTo(StaffMedical::class, 'medecin_id', 'id')->withTrashed();
     }
 
     public function fileAttentes()

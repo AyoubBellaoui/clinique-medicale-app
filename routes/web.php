@@ -13,9 +13,7 @@ use App\Http\Controllers\FacturesController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\PatientsController;
 use App\Http\Controllers\SearchController;
-use App\Models\FileAttente;
 
 // Guest Routes
 Route::middleware('guest')->group(function () {
@@ -108,6 +106,9 @@ Route::middleware('auth')->group(function () {
         Route::put('/users/{id}/reset-password', [UserController::class, 'resetPassword'])->name('users.resetPassword');
         Route::delete('/users/delete/{id}', [UserController::class, 'destroy'])->name('users.delete');
     });
+
+    // Global header search
+    Route::get('/search', [SearchController::class, 'index'])->name('search');
 
     // Notifications
     Route::prefix('notifications')->name('notifications.')->group(function () {

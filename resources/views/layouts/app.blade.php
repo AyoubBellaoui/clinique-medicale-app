@@ -71,7 +71,7 @@
             --ink: #133c35;
             --muted: #7bbfb0;
             --soft: #95c4b8;
-            --sidebar-w: 264px;
+            --sidebar-w: 280px;
             --sidebar-w-collapsed: 76px;
             --header-h: 72px;
             --ring: 0 0 0 3px rgba(52, 168, 140, .15);
@@ -131,12 +131,12 @@
 
         .sidebar.collapsed .sidebar-logo {
             justify-content: center;
-            padding: 24px 12px 20px;
+            padding: 20px 12px 16px;
         }
 
         .sidebar.collapsed .nav-item {
             justify-content: center;
-            padding: 12px;
+            padding: 11px;
         }
 
         .sidebar.collapsed .nav-item.active::before {
@@ -145,11 +145,11 @@
 
         .sidebar.collapsed .sidebar-user {
             justify-content: center;
-            padding: 10px;
+            padding: 9px;
         }
 
         .sidebar-logo {
-            padding: 22px 20px 18px;
+            padding: 20px 20px 16px;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -159,9 +159,9 @@
         }
 
         .sidebar-logo-icon {
-            width: 42px;
-            height: 42px;
-            border-radius: 13px;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
             background: linear-gradient(135deg, var(--teal-300), var(--teal-500) 60%, var(--teal-700));
             display: flex;
             align-items: center;
@@ -176,7 +176,7 @@
         }
 
         .sidebar-logo-text h1 {
-            font-size: 19px;
+            font-size: 20px;
             font-weight: 800;
             color: #fff;
             letter-spacing: -.5px;
@@ -192,7 +192,7 @@
 
         .sidebar-nav {
             flex: 1;
-            padding: 14px 12px;
+            padding: 10px 12px;
             overflow-y: auto;
             position: relative;
             z-index: 1;
@@ -203,32 +203,32 @@
         }
 
         .nav-section-label {
-            font-size: 9.5px;
+            font-size: 10px;
             font-weight: 700;
             color: rgba(255, 255, 255, .32);
             letter-spacing: .14em;
             text-transform: uppercase;
             padding: 0 10px;
-            margin: 18px 0 6px;
+            margin: 12px 0 5px;
         }
 
         .nav-section-label:first-child {
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 11px 12px;
+            padding: 9px 12px;
             border-radius: 11px;
             cursor: pointer;
             transition: all .2s;
             color: rgba(255, 255, 255, .62);
-            font-size: 13.5px;
+            font-size: 14px;
             font-weight: 500;
             text-decoration: none;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
             position: relative;
             white-space: nowrap;
         }
@@ -249,8 +249,8 @@
         }
 
         .nav-item .nav-icon {
-            width: 20px;
-            height: 20px;
+            width: 19px;
+            height: 19px;
             flex-shrink: 0;
         }
 
@@ -261,7 +261,7 @@
             top: 50%;
             transform: translateY(-50%);
             width: 3px;
-            height: 22px;
+            height: 20px;
             background: var(--teal-300);
             border-radius: 0 3px 3px 0;
             box-shadow: 0 0 12px var(--teal-300);
@@ -286,7 +286,7 @@
         }
 
         .sidebar-footer {
-            padding: 14px 12px;
+            padding: 12px;
             border-top: 1px solid rgba(255, 255, 255, .07);
             position: relative;
             z-index: 1;
@@ -296,7 +296,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 10px 12px;
+            padding: 9px 11px;
             border-radius: 11px;
             background: rgba(255, 255, 255, .05);
             cursor: pointer;
@@ -308,8 +308,8 @@
         }
 
         .sidebar-avatar {
-            width: 36px;
-            height: 36px;
+            width: 34px;
+            height: 34px;
             border-radius: 11px;
             background: linear-gradient(135deg, var(--teal-300), var(--teal-600));
             display: flex;
@@ -328,7 +328,7 @@
         }
 
         .sidebar-user-info p {
-            font-size: 12.5px;
+            font-size: 13px;
             font-weight: 600;
             color: rgba(255, 255, 255, .92);
             white-space: nowrap;
@@ -337,7 +337,7 @@
         }
 
         .sidebar-user-info span {
-            font-size: 10.5px;
+            font-size: 11px;
             color: rgba(255, 255, 255, .42);
         }
 
@@ -2647,7 +2647,10 @@
             if (e.target.id === 'modal-backdrop') closeModal();
         });
         document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') closeModal();
+            if (e.key === 'Escape') {
+                closeModal();
+                document.getElementById('search-dropdown')?.classList.remove('show');
+            }
             if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
                 e.preventDefault();
                 document.getElementById('global-search').focus();
@@ -2794,6 +2797,74 @@
         // ── Poll every 30 seconds ──
         refreshCount();
         setInterval(refreshCount, 30000);
+    })();
+    </script>
+
+    {{-- ─── Global Search ─── --}}
+    <script>
+    (function () {
+        const input   = document.getElementById('global-search');
+        const dropdown = document.getElementById('search-dropdown');
+        if (!input || !dropdown) return;
+
+        const SEARCH_URL = '{{ route('search') }}';
+        let debounceTimer = null;
+        let currentRequest = 0;
+
+        function escapeHtml(str) {
+            return String(str).replace(/[&<>"']/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+            }[c]));
+        }
+
+        function render(items) {
+            if (!items.length) {
+                dropdown.innerHTML = '<div class="notif-empty">Aucun résultat</div>';
+                dropdown.classList.add('show');
+                return;
+            }
+
+            dropdown.innerHTML = items.map(item => `
+                <a href="${item.url}" class="notif-item">
+                    <div class="notif-dot ${item.type === 'patient' ? 'teal' : 'violet'}"></div>
+                    <div class="notif-item-body">
+                        <div class="notif-item-msg">${escapeHtml(item.title)}</div>
+                        <div class="notif-item-time">${escapeHtml(item.label)} · ${escapeHtml(item.subtitle || '')}</div>
+                    </div>
+                </a>`).join('');
+            dropdown.classList.add('show');
+        }
+
+        async function search(query) {
+            const requestId = ++currentRequest;
+            try {
+                const res = await fetch(`${SEARCH_URL}?q=${encodeURIComponent(query)}`);
+                const items = await res.json();
+                if (requestId !== currentRequest) return; // a newer keystroke superseded this request
+                render(items);
+            } catch (_) {
+                if (requestId === currentRequest) {
+                    dropdown.innerHTML = '<div class="notif-empty">Erreur de recherche</div>';
+                    dropdown.classList.add('show');
+                }
+            }
+        }
+
+        input.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            const query = input.value.trim();
+
+            if (query.length < 2) {
+                dropdown.classList.remove('show');
+                return;
+            }
+
+            debounceTimer = setTimeout(() => search(query), 250);
+        });
+
+        input.addEventListener('focus', () => {
+            if (input.value.trim().length >= 2) dropdown.classList.add('show');
+        });
     })();
     </script>
 

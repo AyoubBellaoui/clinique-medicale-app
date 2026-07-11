@@ -36,7 +36,7 @@ $staffForJs = $staff->map(function($s) {
 });
 @endphp
 <script>
-const STAFF_DATA = {!! json_encode($staffForJs) !!};
+const STAFF_DATA = @json($staffForJs);
 </script>
 
 {{-- STATS --}}

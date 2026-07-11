@@ -102,14 +102,57 @@
             @for($d = 1; $d <= $monthStart->daysInMonth; $d++)
                 @php
                     $isToday = $today->day === $d && $today->isSameMonth($monthStart);
-                    $count = $apptsByDay->get($d)?->count() ?? 0;
+                    $dayAppts = $apptsByDay->get($d) ?? collect();
+                    $count = $dayAppts->count();
                 @endphp
-                <div class="calendar-day {{ $isToday ? 'today' : '' }} {{ $count > 0 ? 'has-apt' : '' }}">
+                <div class="calendar-day {{ $isToday ? 'today' : '' }} {{ $count > 0 ? 'has-apt' : '' }}" @if($count > 0) data-day-modal="day-appts-{{ $d }}" @endif>
                     <span>{{ $d }}</span>
                     @if($count > 0)
                         <span class="cal-count">{{ $count }} RDV</span>
                     @endif
                 </div>
+
+                @if($count > 0)
+                <template id="day-appts-{{ $d }}">
+                    <div class="modal-header">
+                        <div>
+                            <h3 style="font-size:16px;font-weight:800;color:var(--teal-800);">{{ $d }} {{ $moisFr[$monthStart->month] }} {{ $monthStart->year }}</h3>
+                            <p style="font-size:12.5px;color:var(--muted);margin-top:2px;">{{ $count }} rendez-vous</p>
+                        </div>
+                        <button type="button" class="modal-close" onclick="closeModal()">
+                            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                    <div class="modal-body" style="padding:12px;">
+                        @foreach($dayAppts->sortBy(fn($a) => $a->heure->format('H:i')) as $appt)
+                        @php [$sc, $sl] = $statusMap[$appt->statut] ?? ['gray', $appt->statut]; @endphp
+                        <div class="queue-item">
+                            <div style="display:flex;flex-direction:column;align-items:center;width:44px;padding:4px 6px;background:var(--teal-50);border-radius:10px;flex-shrink:0;">
+                                <div style="font-size:9px;font-weight:700;color:var(--teal-500);text-transform:uppercase;">RDV</div>
+                                <div style="font-size:14px;font-weight:800;color:var(--teal-800);line-height:1;">{{ $appt->heure->format('H:i') }}</div>
+                            </div>
+                            <div class="queue-info">
+                                <p>{{ $appt->patient->full_name ?? 'Patient supprimé' }}</p>
+                                <span>{{ $appt->motif ?: 'Consultation' }} · Dr. {{ $appt->staff->full_name ?? '—' }}</span>
+                            </div>
+                            <span class="badge badge-{{ $sc }}">{{ $sl }}</span>
+                            <div style="display:flex;gap:6px;margin-left:10px;">
+                                <a href="{{ route('appointments.edit', $appt->id) }}" class="btn btn-outline btn-sm btn-icon-only" title="Modifier">
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg>
+                                </a>
+                                <form method="POST" action="{{ route('appointments.delete', $appt->id) }}" onsubmit="return confirm('Supprimer ce rendez-vous ?')" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm btn-icon-only" title="Supprimer">
+                                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </template>
+                @endif
             @endfor
         </div>
     </div>
@@ -175,4 +218,13 @@
 .cal-count { margin-top:auto;font-size:10px;padding:1px 5px;background:rgba(52,168,140,.15);color:var(--teal-700);border-radius:5px;align-self:flex-start;font-weight:700; }
 .calendar-day.today .cal-count { background:rgba(255,255,255,.2);color:#fff; }
 </style>
+<script>
+document.querySelectorAll('.calendar-day[data-day-modal]').forEach(cell => {
+    cell.addEventListener('click', () => {
+        const template = document.getElementById(cell.dataset.dayModal);
+        if (!template) return;
+        openModal(template.innerHTML.trim());
+    });
+});
+</script>
 @endpush

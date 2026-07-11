@@ -36,7 +36,7 @@ $patientsForJs = $patients->map(function($p) {
 });
 @endphp
 <script>
-const PATIENT_DATA = {!! json_encode($patientsForJs) !!};
+const PATIENT_DATA = @json($patientsForJs);
 </script>
 
 {{-- STATS --}}

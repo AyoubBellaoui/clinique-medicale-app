@@ -90,12 +90,15 @@ class PatientTest extends TestCase
 
     public function test_can_delete_a_patient(): void
     {
+        // "Delete" archives (soft-deletes) rather than destroying the row outright —
+        // see DataRetentionTest for why: dependent consultations/invoices/etc. must survive.
         $user = User::factory()->create();
         $patient = Patient::factory()->create();
 
         $response = $this->actingAs($user)->delete(route('patients.delete', $patient->id));
 
         $response->assertRedirect(route('patients.index'));
-        $this->assertDatabaseMissing('patients', ['id' => $patient->id]);
+        $this->assertSoftDeleted('patients', ['id' => $patient->id]);
+        $this->assertNull(Patient::find($patient->id));
     }
 }

@@ -41,12 +41,12 @@ class Facture extends Model
 
     public function patient()
     {
-        return $this->belongsTo(Patient::class);
+        return $this->belongsTo(Patient::class)->withTrashed();
     }
 
     public function staff()
     {
-        return $this->belongsTo(StaffMedical::class);
+        return $this->belongsTo(StaffMedical::class)->withTrashed();
     }
 
     public function consultation()
