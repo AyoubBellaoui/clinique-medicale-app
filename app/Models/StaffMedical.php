@@ -60,6 +60,26 @@ class StaffMedical extends Model
         return $this->hasMany(FileAttente::class, 'staff_id', 'id');
     }
 
+    public function rendezVous()
+    {
+        return $this->hasMany(RendezVous::class, 'staff_id', 'id');
+    }
+
+    public function consultations()
+    {
+        return $this->hasMany(Consultation::class, 'staff_id', 'id');
+    }
+
+    public function ordonnances()
+    {
+        return $this->hasMany(Ordonnance::class, 'staff_id', 'id');
+    }
+
+    public function factures()
+    {
+        return $this->hasMany(Facture::class, 'staff_id', 'id');
+    }
+
     public function user()
     {
         return $this->hasOne(User::class, 'staff_id', 'id');

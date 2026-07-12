@@ -6,7 +6,7 @@
     $inProgressCount = $fileAttente->where('statut', 'en_cours')->count();
     $completedCount = $fileAttente->where('statut', 'termine')->count();
 
-    $waitingTimes = $fileAttente->where('statut', 'en_attente')->map(fn($e) => now()->diffInMinutes($e->arrived_at));
+    $waitingTimes = $fileAttente->where('statut', 'en_attente')->map(fn($e) => abs(now()->diffInMinutes($e->arrived_at)));
     $avgWait = $waitingTimes->count() ? (int) round($waitingTimes->avg()) : null;
 
     $statusMap = [
@@ -139,7 +139,7 @@
                     [$sc, $sl] = $statusMap[$entry->statut] ?? ['gray', $entry->statut];
                     $initials = strtoupper(substr($entry->patient->prenom ?? '', 0, 1) . substr($entry->patient->nom ?? '', 0, 1));
                     $isActive = in_array($entry->statut, ['en_attente', 'en_cours']);
-                    $waitMinutes = $isActive ? now()->diffInMinutes($entry->arrived_at) : null;
+                    $waitMinutes = $isActive ? abs((int) round(now()->diffInMinutes($entry->arrived_at))) : null;
                 @endphp
                 <tr>
                     <td>

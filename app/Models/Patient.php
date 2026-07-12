@@ -62,6 +62,21 @@ class Patient extends Model
         return $this->hasMany(Consultation::class, 'patient_id', 'id');
     }
 
+    public function rendezVous()
+    {
+        return $this->hasMany(RendezVous::class, 'patient_id', 'id');
+    }
+
+    public function ordonnances()
+    {
+        return $this->hasMany(Ordonnance::class, 'patient_id', 'id');
+    }
+
+    public function factures()
+    {
+        return $this->hasMany(Facture::class, 'patient_id', 'id');
+    }
+
     public function getFullNameAttribute(): string
     {
         return $this->nom . ' ' . $this->prenom;

@@ -122,6 +122,19 @@ Cette commande enchaîne : `composer install` → copie `.env` → génération 
 
 ---
 
+## Déploiement sur un serveur Linux
+
+Laravel écrit en permanence dans `storage/` (logs, cache de vues compilées, sessions si `SESSION_DRIVER=file`) et dans `bootstrap/cache/` (cache de config/routes). Sur un serveur Linux, le compte sous lequel tourne PHP-FPM/le serveur web (souvent `www-data`) doit pouvoir écrire dans ces deux dossiers, sinon l'application renvoie une erreur 500 dès la première requête :
+
+```bash
+chown -R $USER:www-data storage bootstrap/cache
+chmod -R 775 storage bootstrap/cache
+```
+
+Ajustez `www-data` au nom réel de l'utilisateur du serveur web si différent (`nginx`, `apache`, etc.). Pensez aussi à mettre `APP_DEBUG=false` dans `.env` avant tout déploiement autre que local — `.env.example` le laisse à `true` pour faciliter le débogage en développement.
+
+---
+
 ## Tests
 
 ```bash
