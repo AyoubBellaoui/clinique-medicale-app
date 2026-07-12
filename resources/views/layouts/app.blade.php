@@ -2747,7 +2747,7 @@
                     <a ${url} class="notif-item ${n.read ? '' : 'unread'}" data-id="${n.id}">
                         <div class="notif-dot ${color}"></div>
                         <div class="notif-item-body">
-                            <div class="notif-item-msg">${n.data.message}</div>
+                            <div class="notif-item-msg">${escapeHtml(n.data.message)}</div>
                             <div class="notif-item-time">${n.time}</div>
                         </div>
                     </a>`;

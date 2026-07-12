@@ -65,7 +65,7 @@ class User extends Authenticatable
 
     public function staff()
     {
-        return $this->belongsTo(StaffMedical::class, 'staff_id');
+        return $this->belongsTo(StaffMedical::class, 'staff_id')->withTrashed();
     }
 
     public function isAdmin(): bool

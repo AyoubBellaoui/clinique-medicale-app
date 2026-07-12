@@ -8,6 +8,7 @@ use App\Models\Patient;
 use App\Models\StaffMedical;
 use App\Notifications\ClinicNotification;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class OrdonnancesController extends Controller
 {
@@ -147,7 +148,12 @@ class OrdonnancesController extends Controller
         return $request->validate([
             'patient_id'          => 'required|exists:patients,id',
             'staff_id'            => 'required|exists:staff_medicals,id',
-            'consultation_id'     => 'nullable|exists:consultations,id',
+            'consultation_id'     => [
+                'nullable',
+                Rule::exists('consultations', 'id')->where(
+                    fn ($query) => $query->where('patient_id', $request->patient_id)
+                ),
+            ],
             'date'                => 'required|date|before_or_equal:today',
             'duree_validite'      => 'nullable|string|max:50',
             'diagnostic_associe'  => 'nullable|string|max:255',
@@ -165,7 +171,7 @@ class OrdonnancesController extends Controller
             'staff_id.required' => 'Le médecin prescripteur est obligatoire.',
             'staff_id.exists'   => 'Médecin invalide.',
 
-            'consultation_id.exists' => 'Consultation invalide.',
+            'consultation_id.exists' => "Consultation invalide ou n'appartenant pas à ce patient.",
 
             'date.required'       => 'La date est obligatoire.',
             'date.date'            => 'Date invalide.',

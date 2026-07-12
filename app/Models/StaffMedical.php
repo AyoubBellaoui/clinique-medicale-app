@@ -81,7 +81,7 @@ class StaffMedical extends Model
 
     public function isSecretary(): bool
     {
-        return $this->role === 'secretariat';
+        return $this->role === 'secretaire';
     }
 
     public function isAdmin(): bool

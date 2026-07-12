@@ -43,7 +43,7 @@ class UserController extends Controller
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'role'     => 'required|in:' . implode(',', self::ROLES),
-            'staff_id' => 'nullable|exists:staff_medicals,id',
+            'staff_id' => ['nullable', 'exists:staff_medicals,id', Rule::unique('users', 'staff_id')],
         ], [
             'email.required'   => "L'email est obligatoire.",
             'email.unique'      => 'Cet email est déjà utilisé.',
@@ -52,6 +52,7 @@ class UserController extends Controller
             'password.confirmed' => 'La confirmation ne correspond pas.',
             'role.required'    => 'Le rôle est obligatoire.',
             'role.in'           => 'Rôle invalide.',
+            'staff_id.unique'   => 'Ce profil personnel est déjà lié à un autre compte utilisateur.',
         ]);
 
         User::create([
@@ -94,12 +95,13 @@ class UserController extends Controller
             'name'     => 'nullable|string|max:255',
             'email'    => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
             'role'     => 'required|in:' . implode(',', self::ROLES),
-            'staff_id' => 'nullable|exists:staff_medicals,id',
+            'staff_id' => ['nullable', 'exists:staff_medicals,id', Rule::unique('users', 'staff_id')->ignore($user->id)],
         ], [
             'email.required' => "L'email est obligatoire.",
             'email.unique'    => 'Cet email est déjà utilisé.',
             'role.required'  => 'Le rôle est obligatoire.',
             'role.in'         => 'Rôle invalide.',
+            'staff_id.unique' => 'Ce profil personnel est déjà lié à un autre compte utilisateur.',
         ]);
 
         if ($user->isAdmin() && $validated['role'] !== 'admin' && User::where('role', 'admin')->count() <= 1) {

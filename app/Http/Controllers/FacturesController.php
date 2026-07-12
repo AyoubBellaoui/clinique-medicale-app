@@ -8,7 +8,9 @@ use App\Models\FileAttente;
 use App\Models\Patient;
 use App\Models\StaffMedical;
 use App\Notifications\ClinicNotification;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class FacturesController extends Controller
 {
@@ -81,8 +83,7 @@ class FacturesController extends Controller
 
         [$sousTotal, $totalTtc] = $this->computeTotals($validated);
 
-        $facture = Facture::create([
-            'numero'              => $this->nextNumero(),
+        $facture = $this->createFactureWithUniqueNumero([
             'patient_id'          => $validated['patient_id'],
             'staff_id'            => $validated['staff_id'] ?? null,
             'consultation_id'     => $validated['consultation_id'] ?? null,
@@ -253,7 +254,12 @@ class FacturesController extends Controller
         $rules = [
             'patient_id'        => 'required|exists:patients,id',
             'staff_id'          => 'nullable|exists:staff_medicals,id',
-            'consultation_id'   => 'nullable|exists:consultations,id',
+            'consultation_id'   => [
+                'nullable',
+                Rule::exists('consultations', 'id')->where(
+                    fn ($query) => $query->where('patient_id', $request->patient_id)
+                ),
+            ],
             'date'              => 'required|date|before_or_equal:today',
             'due_date'          => 'nullable|date|after_or_equal:date',
             'payment_method'    => 'required|in:especes,carte,cheque,virement,assurance',
@@ -273,7 +279,7 @@ class FacturesController extends Controller
             'patient_id.exists'   => 'Patient invalide.',
 
             'staff_id.exists'        => 'Médecin invalide.',
-            'consultation_id.exists' => 'Consultation invalide.',
+            'consultation_id.exists' => "Consultation invalide ou n'appartenant pas à ce patient.",
 
             'date.required'       => 'La date est obligatoire.',
             'date.date'            => 'Date invalide.',
@@ -343,5 +349,26 @@ class FacturesController extends Controller
         $count = Facture::whereYear('date_facturation', $year)->count();
 
         return sprintf('FAC-%d-%04d', $year, $count + 1);
+    }
+
+    /**
+     * Create a Facture, regenerating the numero and retrying if two concurrent
+     * submits raced on nextNumero() and collided on the unique constraint.
+     */
+    private function createFactureWithUniqueNumero(array $attributes): Facture
+    {
+        $maxAttempts = 5;
+
+        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+            try {
+                return Facture::create(['numero' => $this->nextNumero()] + $attributes);
+            } catch (QueryException $e) {
+                $isDuplicateNumero = $e->getCode() === '23000' && str_contains($e->getMessage(), 'numero');
+
+                if (!$isDuplicateNumero || $attempt === $maxAttempts) {
+                    throw $e;
+                }
+            }
+        }
     }
 }

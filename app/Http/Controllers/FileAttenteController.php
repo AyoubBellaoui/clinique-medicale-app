@@ -8,6 +8,7 @@ use App\Models\RendezVous;
 use App\Models\StaffMedical;
 use App\Notifications\ClinicNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class FileAttenteController extends Controller
 {
@@ -101,10 +102,9 @@ class FileAttenteController extends Controller
             ? today()->setTimeFromTimeString($validated['arrived_at'])
             : now();
 
-        $validated['statut']   = 'en_attente';
-        $validated['position'] = FileAttente::whereDate('arrived_at', today())->count() + 1;
+        $validated['statut'] = 'en_attente';
 
-        $entry = FileAttente::create($validated);
+        $entry = $this->createQueueEntryWithPosition($validated);
         $patient = $entry->patient;
 
         ClinicNotification::broadcast(
@@ -223,5 +223,21 @@ class FileAttenteController extends Controller
         flash()->success('Patient retiré de la file d\'attente.');
 
         return redirect()->route('fileAttente.index');
+    }
+
+    /**
+     * Assign the next queue position and create the entry inside a transaction that
+     * locks today's existing rows, so two concurrent walk-ins can't both read the same
+     * count and land on the same position (a plain count-then-insert is a race).
+     */
+    private function createQueueEntryWithPosition(array $validated): FileAttente
+    {
+        return DB::transaction(function () use ($validated) {
+            $count = FileAttente::whereDate('arrived_at', today())->lockForUpdate()->count();
+
+            $validated['position'] = $count + 1;
+
+            return FileAttente::create($validated);
+        });
     }
 }

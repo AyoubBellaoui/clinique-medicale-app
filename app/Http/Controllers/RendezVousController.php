@@ -7,6 +7,7 @@ use App\Models\RendezVous;
 use App\Models\StaffMedical;
 use App\Notifications\ClinicNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -97,7 +98,7 @@ class RendezVousController extends Controller
             ]);
         }
 
-        $appointment = RendezVous::create($validated);
+        $appointment = $this->createAppointmentIfAvailable($validated);
 
         ClinicNotification::broadcast(
             'appointment', "Nouveau rendez-vous : {$appointment->patient->full_name} le {$appointment->date->format('d/m/Y')} à {$appointment->heure->format('H:i')}",
@@ -190,7 +191,7 @@ class RendezVousController extends Controller
             'notes.max' => 'Max 1000 caractères.',
         ]);
 
-        $appointment->update($validated);
+        $this->updateAppointmentIfAvailable($appointment, $validated);
 
         ClinicNotification::broadcast(
             'appointment', "Rendez-vous mis à jour : {$appointment->patient->full_name} le {$appointment->date->format('d/m/Y')}",
@@ -219,5 +220,53 @@ class RendezVousController extends Controller
         flash()->success('Rendez-vous supprimé.');
 
         return redirect()->route('appointments.index');
+    }
+
+    /**
+     * Re-check the slot for conflicts and create the appointment inside a transaction
+     * that locks the doctor's row, so two concurrent submits for the same slot can't
+     * both pass the "no conflict" check before either one inserts (the validate()
+     * unique rule above is a fast-path check but doesn't close that race on its own).
+     */
+    private function createAppointmentIfAvailable(array $validated): RendezVous
+    {
+        return DB::transaction(function () use ($validated) {
+            StaffMedical::whereKey($validated['staff_id'])->lockForUpdate()->first();
+
+            $this->assertSlotAvailable($validated);
+
+            return RendezVous::create($validated);
+        });
+    }
+
+    /**
+     * Same guard as createAppointmentIfAvailable(), but for updates: locks the doctor's
+     * row, re-checks the slot excluding the appointment being edited, then saves.
+     */
+    private function updateAppointmentIfAvailable(RendezVous $appointment, array $validated): void
+    {
+        DB::transaction(function () use ($appointment, $validated) {
+            StaffMedical::whereKey($validated['staff_id'])->lockForUpdate()->first();
+
+            $this->assertSlotAvailable($validated, $appointment->id);
+
+            $appointment->update($validated);
+        });
+    }
+
+    private function assertSlotAvailable(array $validated, ?int $ignoreId = null): void
+    {
+        $conflict = RendezVous::where('staff_id', $validated['staff_id'])
+            ->whereDate('date', $validated['date'])
+            ->where('heure', $validated['heure'])
+            ->where('statut', '!=', 'annule')
+            ->when($ignoreId, fn($query) => $query->whereKeyNot($ignoreId))
+            ->exists();
+
+        if ($conflict) {
+            throw ValidationException::withMessages([
+                'heure' => 'Ce médecin a déjà un rendez-vous à cette heure ce jour-là.',
+            ]);
+        }
     }
 }

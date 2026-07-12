@@ -9,6 +9,7 @@ use App\Models\RendezVous;
 use App\Models\StaffMedical;
 use App\Notifications\ClinicNotification;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ConsultationController extends Controller
 {
@@ -188,7 +189,12 @@ class ConsultationController extends Controller
         return $request->validate([
             'patient_id'          => 'required|exists:patients,id',
             'staff_id'            => 'required|exists:staff_medicals,id',
-            'file_attente_id'     => 'nullable|exists:file_attentes,id',
+            'file_attente_id'     => [
+                'nullable',
+                Rule::exists('file_attentes', 'id')->where(
+                    fn ($query) => $query->where('patient_id', $request->patient_id)
+                ),
+            ],
             'date'                => 'required|date|before_or_equal:today',
             'heure'               => 'required|date_format:H:i',
             'type_consultation'   => 'required|in:standard,suivi,urgence,controle_post_operatoire,bilan_complet',
@@ -210,6 +216,8 @@ class ConsultationController extends Controller
 
             'staff_id.required' => 'Le médecin est obligatoire.',
             'staff_id.exists'   => 'Médecin invalide.',
+
+            'file_attente_id.exists' => "Cette entrée de file d'attente n'appartient pas à ce patient.",
 
             'date.required'         => 'La date est obligatoire.',
             'date.date'              => 'Date invalide.',

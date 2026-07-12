@@ -6,6 +6,7 @@ use App\Models\Patient;
 use App\Models\StaffMedical;
 use App\Notifications\ClinicNotification;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PatientController extends Controller
 {
@@ -53,7 +54,10 @@ class PatientController extends Controller
             // Section 2 – Medical
             'allergies'      => 'nullable|string|max:500',
             'antecedents'    => 'nullable|string|max:2000',
-            'medecin_id'     => 'nullable|exists:staff_medicals,id',
+            'medecin_id'     => [
+                'nullable',
+                Rule::exists('staff_medicals', 'id')->whereIn('role', ['medecin', 'infirmier']),
+            ],
             'statut_dossier' => 'nullable|in:actif,inactif',
 
             // Section 3 – Insurance & Emergency
@@ -95,7 +99,7 @@ class PatientController extends Controller
             // medical
             'allergies.max'      => 'Max 500 caractères pour les allergies.',
             'antecedents.max'    => 'Max 2000 caractères pour les antécédents.',
-            'medecin_id.exists'  => 'Médecin invalide.',
+            'medecin_id.exists'  => 'Médecin invalide : doit être un médecin ou un infirmier.',
             'statut_dossier.in'  => 'Statut invalide.',
 
             // insurance / emergency
@@ -171,7 +175,10 @@ class PatientController extends Controller
             // Section 2 – Medical
             'allergies'      => 'nullable|string|max:500',
             'antecedents'    => 'nullable|string|max:2000',
-            'medecin_id'     => 'nullable|exists:staff_medicals,id',
+            'medecin_id'     => [
+                'nullable',
+                Rule::exists('staff_medicals', 'id')->whereIn('role', ['medecin', 'infirmier']),
+            ],
             'statut_dossier' => 'nullable|in:actif,inactif',
 
             // Section 3 – Insurance & Emergency
@@ -213,7 +220,7 @@ class PatientController extends Controller
             // medical
             'allergies.max'      => 'Max 500 caractères pour les allergies.',
             'antecedents.max'    => 'Max 2000 caractères pour les antécédents.',
-            'medecin_id.exists'  => 'Médecin invalide.',
+            'medecin_id.exists'  => 'Médecin invalide : doit être un médecin ou un infirmier.',
             'statut_dossier.in'  => 'Statut invalide.',
 
             // insurance / emergency
