@@ -2703,6 +2703,12 @@
 
         const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 
+        function escapeHtml(str) {
+            return String(str).replace(/[&<>"']/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+            }[c]));
+        }
+
         const iconColors = {
             teal:   '#34a88c',
             blue:   '#3b82f6',
