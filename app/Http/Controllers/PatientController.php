@@ -20,6 +20,33 @@ class PatientController extends Controller
     }
 
     /**
+     * List archived (soft-deleted) patients.
+     */
+    public function archived()
+    {
+        $patients = Patient::onlyTrashed()->with('medecin')->orderBy('deleted_at', 'desc')->get();
+        return view('patients.archived', compact('patients'));
+    }
+
+    /**
+     * Restore an archived patient.
+     */
+    public function restore(string $id)
+    {
+        $p = Patient::onlyTrashed()->findOrFail($id);
+        $p->restore();
+
+        ClinicNotification::broadcast(
+            'patient', "Patient restauré : {$p->prenom} {$p->nom}",
+            'patient', 'teal', route('patients.index')
+        );
+
+        flash()->success('Patient restauré avec succès.');
+
+        return redirect()->route('patients.archived');
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()

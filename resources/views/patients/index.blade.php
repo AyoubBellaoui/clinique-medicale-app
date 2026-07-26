@@ -118,6 +118,13 @@ const PATIENT_DATA = @json($patientsForJs);
 
             <button class="btn btn-outline btn-sm">Exporter</button>
 
+            <a href="{{ route('patients.archived') }}" class="btn btn-outline btn-sm" title="Patients archivés">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m6 4.125h4.5m-8.25-6.75h12a1.125 1.125 0 011.125 1.125v1.5a1.125 1.125 0 01-1.125 1.125h-12A1.125 1.125 0 013.75 7.5V6a1.125 1.125 0 011.125-1.125z"/>
+                </svg>
+                Archivés
+            </a>
+
             <a href="{{ route('patients.create') }}" class="btn btn-primary btn-sm">
                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>

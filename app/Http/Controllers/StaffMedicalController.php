@@ -18,6 +18,33 @@ class StaffMedicalController extends Controller
     }
 
     /**
+     * List archived (soft-deleted) staff members.
+     */
+    public function archived()
+    {
+        $staff = StaffMedical::onlyTrashed()->orderBy('deleted_at', 'desc')->get();
+        return view('staff.archived', compact('staff'));
+    }
+
+    /**
+     * Restore an archived staff member.
+     */
+    public function restore(string $id)
+    {
+        $s = StaffMedical::onlyTrashed()->findOrFail($id);
+        $s->restore();
+
+        ClinicNotification::broadcast(
+            'staff', "Membre restauré : {$s->prenom} {$s->nom}",
+            'staff', 'violet', route('staff.index')
+        );
+
+        flash()->success('Membre du personnel restauré avec succès.');
+
+        return redirect()->route('staff.archived');
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()

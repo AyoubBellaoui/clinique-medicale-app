@@ -95,7 +95,7 @@ Après suppression du médecin : consultations=0, rendez_vous=0
 → Les dossiers médicaux et les factures ont une valeur légale et doivent être conservés même quand un patient n'est plus suivi ou qu'un employé quitte la clinique. La suppression douce archive (masque) sans détruire — c'est le pattern standard pour ce type de données réglementées.
 
 **« Que reste-t-il à améliorer ? »** *(anticiper, ne pas se faire surprendre)*
-→ Pas d'interface pour consulter/restaurer les dossiers archivés (la donnée est préservée en base, mais inaccessible depuis l'UI actuellement) ; pas d'audit de sécurité formel au-delà des points corrigés ; couverture de tests à ~90% des contrôleurs, pas 100%.
+→ Pas d'audit de sécurité formel au-delà des points corrigés ; couverture de tests à ~90% des contrôleurs, pas 100%. (L'interface de consultation/restauration des dossiers archivés — Patients et Staff Médical — a depuis été ajoutée : voir `PatientController::archived()/restore()`, `StaffMedicalController::archived()/restore()`, et les 6 tests correspondants dans `DataRetentionTest.php`.)
 
 ---
 

@@ -28,19 +28,23 @@ Route::middleware('auth')->group(function () {
 
     // Patients
     Route::get('/patients', [PatientController::class, 'index'])->name('patients.index');
+    Route::get('/patients/archived', [PatientController::class, 'archived'])->name('patients.archived');
     Route::get('/patients/create', [PatientController::class, 'create'])->name('patients.create');
     Route::post('/patients/store', [PatientController::class, 'store'])->name('patients.store');
     Route::get('/patients/{id}/edit', [PatientController::class, 'edit'])->name('patients.edit');
     Route::put('/patients/{id}/update', [PatientController::class, 'update'])->name('patients.update');
+    Route::put('/patients/{id}/restore', [PatientController::class, 'restore'])->name('patients.restore');
     Route::delete('/patients/delete/{id}', [PatientController::class, 'destroy'])->name('patients.delete');
 
     // Staff Medical — HR-sensitive (salary/contract data), admin only
     Route::middleware('role')->group(function () {
         Route::get('/staff', [StaffMedicalController::class, 'index'])->name('staff.index');
+        Route::get('/staff/archived', [StaffMedicalController::class, 'archived'])->name('staff.archived');
         Route::get('/staff/create', [StaffMedicalController::class, 'create'])->name('staff.create');
         Route::post('/staff/store', [StaffMedicalController::class, 'store'])->name('staff.store');
         Route::get('/staff/{id}/edit', [StaffMedicalController::class, 'edit'])->name('staff.edit');
         Route::put('/staff/{id}/update', [StaffMedicalController::class, 'update'])->name('staff.update');
+        Route::put('/staff/{id}/restore', [StaffMedicalController::class, 'restore'])->name('staff.restore');
         Route::delete('/Staff/delete/{id}', [StaffMedicalController::class, 'destroy'])->name('staff.delete');
     });
 

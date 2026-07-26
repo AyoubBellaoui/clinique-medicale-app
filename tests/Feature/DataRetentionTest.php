@@ -79,4 +79,69 @@ class DataRetentionTest extends TestCase
         $this->assertTrue($ids->contains($keep->id));
         $this->assertFalse($ids->contains($archived->id));
     }
+
+    public function test_archived_patients_page_lists_only_soft_deleted_patients(): void
+    {
+        $user = User::factory()->create();
+        $active = Patient::factory()->create();
+        $archived = Patient::factory()->create();
+        $archived->delete();
+
+        $response = $this->actingAs($user)->get(route('patients.archived'));
+
+        $response->assertOk();
+        $response->assertSee($archived->cin);
+        $response->assertDontSee($active->cin);
+    }
+
+    public function test_restoring_a_patient_returns_it_to_the_active_index(): void
+    {
+        $user = User::factory()->create();
+        $patient = Patient::factory()->create();
+        $patient->delete();
+
+        $response = $this->actingAs($user)->put(route('patients.restore', $patient->id));
+
+        $response->assertRedirect(route('patients.archived'));
+        $this->assertDatabaseHas('patients', ['id' => $patient->id, 'deleted_at' => null]);
+        $this->assertTrue(Patient::pluck('id')->contains($patient->id));
+    }
+
+    public function test_archived_staff_page_lists_only_soft_deleted_staff(): void
+    {
+        $admin = User::factory()->role('admin')->create();
+        $active = StaffMedical::factory()->create();
+        $archived = StaffMedical::factory()->create();
+        $archived->delete();
+
+        $response = $this->actingAs($admin)->get(route('staff.archived'));
+
+        $response->assertOk();
+        $response->assertSee($archived->cin);
+        $response->assertDontSee($active->cin);
+    }
+
+    public function test_restoring_a_staff_member_returns_it_to_the_active_index(): void
+    {
+        $admin = User::factory()->role('admin')->create();
+        $staff = StaffMedical::factory()->create();
+        $staff->delete();
+
+        $response = $this->actingAs($admin)->put(route('staff.restore', $staff->id));
+
+        $response->assertRedirect(route('staff.archived'));
+        $this->assertDatabaseHas('staff_medicals', ['id' => $staff->id, 'deleted_at' => null]);
+        $this->assertTrue(StaffMedical::pluck('id')->contains($staff->id));
+    }
+
+    public function test_non_admin_cannot_view_or_restore_archived_staff(): void
+    {
+        $user = User::factory()->create(['role' => 'medecin']);
+        $staff = StaffMedical::factory()->create();
+        $staff->delete();
+
+        $this->actingAs($user)->get(route('staff.archived'))->assertRedirect(route('dashboard.show'));
+        $this->actingAs($user)->put(route('staff.restore', $staff->id))->assertRedirect(route('dashboard.show'));
+        $this->assertSoftDeleted('staff_medicals', ['id' => $staff->id]);
+    }
 }

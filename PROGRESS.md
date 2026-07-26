@@ -2,7 +2,7 @@
 
 A step-by-step story of how this app was built, in build order, so it's easy to re-read and remember the journey. Keep adding new numbered steps as work continues — don't regenerate this file from scratch.
 
-**Last updated:** 2026-07-09 (last commit so far: `b369fd8`, 2026-07-08; step 19 / File d'attente CRUD below is uncommitted, working-tree changes ready to commit)
+**Last updated:** 2026-07-26 (last commit so far: `99e8923`; step 27 below is uncommitted, working-tree changes ready to commit)
 
 ---
 
@@ -123,6 +123,11 @@ Modeled three permission tiers instead of five separate per-role rules, since th
 Built a new admin-only **Utilisateurs** module (`UserController`, first controller in this app with no self-service equivalent) to manage login accounts: create one (optionally linked to an unlinked `StaffMedical` record via a new `StaffMedical::user()` hasOne — the inverse of `User::staff()`), edit its name/email/role/staff link, and — the direct replacement for self-service password reset — a dedicated "Réinitialiser le mot de passe" action that lets the admin set a new password for any account with no current-password check, matching the stated design ("admin has full control, no forgot-password flow needed"). Added two safety guards a real admin panel needs: a user can't delete their own account through this screen (self-lockout risk), and the system refuses to demote or delete the *last* remaining admin account (would lock everyone out of user management permanently).
 
 Verified end-to-end against the real database: admin reaches every module including the new Utilisateurs page; a created `secretariat` account can reach Patients/File d'attente/Rendez-vous/Facturation but is redirected away from Staff/Consultations/Ordonnances/Utilisateurs; a created `medecin` account shows the exact opposite pattern (Consultations/Ordonnances reachable, Facturation/Staff/Utilisateurs blocked); the sidebar correctly hides the links each role can't use; admin-driven password reset works (logged in as the target user with the new password to confirm); self-deletion is rejected; demoting the sole admin account is rejected with the account left unchanged. All test accounts created during verification were deleted afterward, leaving only the original admin account.
+
+**27. Archived-records UI for Patients and Staff médical**
+The one concrete gap flagged in `JURY-DEFENSE-PREP.md`'s "what's left to improve" section: `SoftDeletes` (step in the data-retention work) meant archiving a patient or staff member preserved the row in the database, but there was no screen to ever see or recover it again — a "delete" was effectively permanent from the user's point of view even though the data survived underneath. Added `archived()` (lists `onlyTrashed()` records) and `restore()` actions to both `PatientController` and `StaffMedicalController`, two new routes each (`GET .../archived`, `PUT .../{id}/restore`, the staff pair inside the existing admin-only `role` middleware group), and two new views (`patients/archived.blade.php`, `staff/archived.blade.php`) reusing the existing table/card styling with a one-click "Restaurer" action per row. Linked from an "Archivés" button next to each module's existing "Exporter"/"Nouveau ..." header buttons rather than adding new sidebar entries, since this is a sub-view of an existing module, not a new one.
+
+Added 6 tests to `DataRetentionTest.php` covering both modules: the archived listing shows only soft-deleted records (not active ones), restoring a record returns it to the active index and clears `deleted_at`, and a non-admin is redirected away from both the staff archived listing and the staff restore action (same `role` middleware boundary as the rest of Staff Médical). Full suite: 69 → 74 tests, all passing.
 
 ---
 
