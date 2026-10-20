@@ -1,229 +1,126 @@
-# Clinique Médicale — Application de Gestion
+# ClinicPro — Medical Clinic Management
 
-Application web de gestion de clinique médicale développée avec Laravel 13 et Tailwind CSS.
+Web application for managing a medical clinic: patients, staff, waiting queue, appointments, consultations, prescriptions and billing.
 
----
-
-## Stack Technique
-
-| Couche | Technologie |
-|--------|-------------|
-| Backend | PHP 8.3 · Laravel 13 |
-| Base de données | MySQL |
-| Frontend | Blade · Tailwind CSS v4 |
-| Build | Vite 8 · laravel-vite-plugin |
-| Auth | Laravel Auth (sessions) |
-| Flash messages | php-flasher/flasher-laravel |
-| Tests | PHPUnit 12 |
+**Stack:** PHP 8.3 · Laravel 13 · MySQL 8 · Blade · Tailwind CSS v4 · Vite 8 · PHPUnit 12
 
 ---
 
-## Fonctionnalités
+## Requirements
 
-- Authentification avec rate limiting (5 tentatives / minute)
-- Gestion des **patients** (dossier médical complet : groupe sanguin, allergies, antécédents, assurance, contact d'urgence)
-- Gestion du **personnel médical** (médecins, secrétaires, admins — spécialité, contrat, planning)
-- **File d'attente** en temps réel
-- **Rendez-vous** (appointments)
-- **Consultations**
-- **Ordonnances** (prescriptions)
-- **Facturation** (billing)
-- Tableau de bord (dashboard)
-- Gestion du compte utilisateur
-
----
-
-## Prérequis
-
-- PHP >= 8.3 avec extensions : `pdo_mysql`, `mbstring`, `openssl`, `tokenizer`, `xml`
+- PHP >= 8.3 (extensions `pdo_mysql`, `mbstring`, `openssl`, `tokenizer`, `xml`)
 - Composer
 - Node.js >= 18 + npm
-- MySQL >= 8
+- MySQL >= 8 (on Windows, Laragon or XAMPP is enough)
 
 ---
 
 ## Installation
 
-### 1. Cloner le projet
+**1. Clone the project**
 
 ```bash
-git clone <url-du-repo> clinique-medicale-app
+git clone <repo-url> clinique-medicale-app
 cd clinique-medicale-app
 ```
 
-### 2. Installer les dépendances
-
-```bash
-composer install
-npm install
-```
-
-### 3. Configurer l'environnement
+**2. Create the `.env` file**
 
 ```bash
 cp .env.example .env
-php artisan key:generate
 ```
 
-Éditer `.env` et renseigner la base de données :
+`.env.example` uses SQLite by default. To use MySQL, replace the `DB_` block with:
 
 ```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=clinique_medicale
+DB_DATABASE=medical_app_db
 DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-### 4. Créer la base de données et lancer les migrations
+**3. Create the database** `medical_app_db` in MySQL (phpMyAdmin, HeidiSQL or `CREATE DATABASE medical_app_db;`).
 
-```bash
-# Créer la base de données dans MySQL, puis :
-php artisan migrate --seed
-```
-
-`--seed` crée le compte administrateur par défaut (voir [Accès par défaut](#accès-par-défaut)) — sans lui, l'application n'a aucun utilisateur et il est impossible de se connecter (il n'y a pas de page d'inscription).
-
-### 5. Compiler les assets
-
-```bash
-npm run build
-```
-
----
-
-## Lancer en développement
-
-La commande suivante démarre en parallèle le serveur Laravel, la queue, les logs (Pail) et Vite :
-
-```bash
-composer run dev
-```
-
-Ou séparément :
-
-```bash
-php artisan serve        # serveur HTTP → http://127.0.0.1:8000
-npm run dev              # Vite HMR
-php artisan queue:listen # file de jobs
-php artisan pail         # logs en temps réel
-```
-
----
-
-## Raccourci tout-en-un (setup complet)
+**4. Run the setup**
 
 ```bash
 composer run setup
 ```
 
-Cette commande enchaîne : `composer install` → copie `.env` → génération de clé → migrations → `npm install` → `npm run build`.
+This installs the PHP and JS dependencies, generates the application key, runs the migrations with seeding, and builds the assets.
+
+The seed creates the admin account plus demo data (staff, patients, appointments, invoices…).
 
 ---
 
-## Déploiement sur un serveur Linux
-
-Laravel écrit en permanence dans `storage/` (logs, cache de vues compilées, sessions si `SESSION_DRIVER=file`) et dans `bootstrap/cache/` (cache de config/routes). Sur un serveur Linux, le compte sous lequel tourne PHP-FPM/le serveur web (souvent `www-data`) doit pouvoir écrire dans ces deux dossiers, sinon l'application renvoie une erreur 500 dès la première requête :
+## Running the app
 
 ```bash
-chown -R $USER:www-data storage bootstrap/cache
-chmod -R 775 storage bootstrap/cache
+php artisan serve
 ```
 
-Ajustez `www-data` au nom réel de l'utilisateur du serveur web si différent (`nginx`, `apache`, etc.). Pensez aussi à mettre `APP_DEBUG=false` dans `.env` avant tout déploiement autre que local — `.env.example` le laisse à `true` pour faciliter le débogage en développement.
+Open **http://127.0.0.1:8000**.
+
+To edit views or CSS with live reload, start Vite in a second terminal:
+
+```bash
+npm run dev
+```
+
+> **Windows:** don't use `composer run dev`. That script also starts `php artisan pail`, which requires the `pcntl` extension (not available on Windows); when it fails, it stops all the other processes. Run the two commands above separately instead.
+
+---
+
+## Default login
+
+| Email | Password |
+|-------|----------|
+| `admin@clinicpro.ma` | `admin123` |
+
+There is no sign-up page: other accounts are created from **Utilisateurs** (`/users`). **Change this password before any production deployment.**
+
+---
+
+## Roles & permissions
+
+Available roles: `admin`, `medecin`, `infirmier`, `secretariat`, `technicien`. `admin` has access to everything.
+
+| Module | Route | Allowed roles |
+|--------|-------|---------------|
+| Dashboard, Patients, Waiting queue, Appointments, My account | `/dashboard`, `/patients`, `/fileAttente`, `/appointments`, `/account` | All |
+| Global search | `/search` | All ("Staff" results limited to admins) |
+| Consultations, Prescriptions | `/consultations`, `/prescriptions` | `admin`, `medecin`, `infirmier` |
+| Billing | `/billing` | `admin`, `secretariat`, `technicien` |
+| Medical staff, User accounts | `/staff`, `/users` | `admin` |
+
+These rules are enforced server-side by the [`EnsureRole`](app/Http/Middleware/EnsureRole.php) middleware.
+
+---
+
+## Data retention
+
+Deleting a patient or staff member **archives** it (`SoftDeletes`) without erasing their consultations, appointments, prescriptions or invoices, which have legal value. Archived records can be viewed and restored from `/patients/archived` and `/staff/archived`.
 
 ---
 
 ## Tests
 
 ```bash
-composer run test
-# ou directement :
 php artisan test
 ```
 
-Suite de tests (PHPUnit, SQLite en mémoire) couvrant l'authentification, le contrôle d'accès par rôle, les patients, la file d'attente, les consultations, les rendez-vous, la facturation (calcul des montants, factures en retard), les ordonnances, la gestion du personnel/des comptes, la recherche globale et la rétention des données (archivage vs. suppression définitive).
-
-Un workflow GitHub Actions (`.github/workflows/tests.yml`) exécute cette suite à chaque push/PR sur `main`.
+Tests run on in-memory SQLite (no database to configure). They also run on GitHub Actions on every push or PR to `main`.
 
 ---
 
-## Structure principale
+## Deployment (Linux)
 
+- Set `APP_ENV=production` and `APP_DEBUG=false` in `.env`.
+- Give the web server write access, otherwise you'll get a 500 error:
+
+```bash
+chown -R $USER:www-data storage bootstrap/cache
+chmod -R 775 storage bootstrap/cache
 ```
-app/
-├── Http/Controllers/
-│   ├── AuthController.php
-│   ├── DashboardController.php
-│   ├── PatientController.php
-│   ├── StaffMedicalController.php
-│   ├── FileAttenteController.php
-│   ├── RendezVousController.php
-│   ├── ConsultationController.php
-│   ├── OrdonnancesController.php
-│   ├── FacturesController.php
-│   ├── AccountController.php
-│   ├── UserController.php
-│   └── SearchController.php
-├── Models/
-│   ├── Patient.php
-│   ├── StaffMedical.php
-│   ├── FileAttente.php
-│   ├── RendezVous.php
-│   ├── Consultation.php
-│   └── Ordonnances.php
-resources/views/
-│   ├── auth/
-│   ├── dashboard/
-│   ├── patients/
-│   ├── staff/
-│   ├── fileAttente/
-│   ├── appointments/
-│   ├── consultations/
-│   ├── prescriptions/
-│   ├── billing/
-│   └── layouts/
-database/migrations/
-routes/web.php
-```
-
----
-
-## Accès par défaut
-
-`php artisan migrate --seed` (ou `php artisan db:seed`) crée automatiquement un compte administrateur :
-
-| Email | Mot de passe |
-|-------|---------------|
-| `admin@clinicpro.ma` | `admin123` |
-
-Se connecter sur `/`, puis créer les autres comptes depuis **Utilisateurs** (`/users`, réservé aux admins). **Changez ce mot de passe avant tout déploiement autre que local.**
-
----
-
-## Rôles & permissions
-
-Chaque utilisateur (`users.role`) a l'un des rôles suivants : `admin`, `medecin`, `infirmier`, `secretariat`, `technicien`. Un `admin` a accès à tout ; les autres rôles sont restreints par module :
-
-| Module | Route | Rôles autorisés |
-|--------|-------|------------------|
-| Tableau de bord | `/dashboard` | Tous les utilisateurs connectés |
-| Patients | `/patients` | Tous les utilisateurs connectés |
-| File d'attente | `/fileAttente` | Tous les utilisateurs connectés |
-| Rendez-vous | `/appointments` | Tous les utilisateurs connectés |
-| Mon compte | `/account` | Tous les utilisateurs connectés |
-| Recherche globale | `/search` | Tous (résultats "Personnel" limités aux admins) |
-| Personnel médical (RH) | `/staff` | `admin` uniquement |
-| Comptes utilisateurs | `/users` | `admin` uniquement |
-| Consultations | `/consultations` | `admin`, `medecin`, `infirmier` |
-| Ordonnances | `/prescriptions` | `admin`, `medecin`, `infirmier` |
-| Facturation | `/billing` | `admin`, `secretariat`, `technicien` |
-
-Ces règles sont appliquées côté serveur par le middleware `EnsureRole` (`app/Http/Middleware/EnsureRole.php`), pas seulement côté interface.
-
----
-
-## Rétention des données médicales
-
-Les patients et le personnel médical sont en **suppression douce** (`SoftDeletes`) : "supprimer" un patient ou un membre du personnel l'archive (masqué des listes actives) sans détruire ses consultations, rendez-vous, ordonnances ou factures — ces enregistrements ont une valeur légale/médicale et doivent survivre à l'archivage de la fiche qui leur est liée. Un dossier archivé reste consultable et restaurable depuis l'interface : bouton **Archivés** sur les pages Patients (`/patients/archived`) et Staff Médical (`/staff/archived`, admin uniquement), avec une action **Restaurer** par ligne. Voir `database/migrations/2026_07_11_100000_add_soft_deletes_to_patients_and_staff.php` et `tests/Feature/DataRetentionTest.php`.
