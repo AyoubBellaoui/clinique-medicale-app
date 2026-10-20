@@ -118,4 +118,42 @@ class FacturesTest extends TestCase
 
         $this->assertFalse($facture->isOverdue());
     }
+
+    public function test_printable_invoice_shows_lines_totals_and_insurance_share(): void
+    {
+        $user = User::factory()->role('secretariat')->create();
+
+        // 550 sous-total; 10% discount (-55) -> 495 HT; 20% tax (+99) -> 594 TTC;
+        // CNSS covers 70% of 594 = 415.80, leaving 178.20 for the patient.
+        $facture = Facture::factory()->create([
+            'sous_total' => 550,
+            'remise' => 10,
+            'tva' => 20,
+            'total_ttc' => 594,
+            'assurance' => 'CNSS',
+            'taux_remboursement' => 70,
+        ]);
+        $facture->lignes()->createMany([
+            ['designation' => 'Consultation', 'quantite' => 2, 'prix_unitaire' => 200],
+            ['designation' => 'Analyse', 'quantite' => 1, 'prix_unitaire' => 150],
+        ]);
+
+        $response = $this->actingAs($user)->get(route('billing.show', $facture->id));
+
+        $response->assertOk();
+        $response->assertSee($facture->numero);
+        $response->assertSee($facture->patient->full_name);
+        $response->assertSeeInOrder(['Consultation', '400,00 MAD', 'Analyse', '150,00 MAD']);
+        $response->assertSeeInOrder(['55,00 MAD', '495,00 MAD', '99,00 MAD', '594,00 MAD', '415,80 MAD', '178,20 MAD']);
+    }
+
+    public function test_non_support_role_cannot_view_a_printable_invoice(): void
+    {
+        $user = User::factory()->role('medecin')->create();
+        $facture = Facture::factory()->create();
+
+        $response = $this->actingAs($user)->get(route('billing.show', $facture->id));
+
+        $response->assertRedirect(route('dashboard.show'));
+    }
 }

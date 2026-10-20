@@ -9,6 +9,14 @@ class Facture extends Model
 {
     use HasFactory;
 
+    public const PAYMENT_LABELS = [
+        'especes'   => 'Espèces',
+        'carte'     => 'Carte',
+        'cheque'    => 'Chèque',
+        'virement'  => 'Virement',
+        'assurance' => 'Assurance',
+    ];
+
     protected $fillable = [
         'numero',
         'patient_id',

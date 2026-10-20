@@ -44,7 +44,7 @@ class FacturesController extends Controller
             ];
         }
 
-        $paymentLabels = ['especes' => 'Espèces', 'carte' => 'Carte', 'cheque' => 'Chèque', 'virement' => 'Virement', 'assurance' => 'Assurance'];
+        $paymentLabels = Facture::PAYMENT_LABELS;
         $paymentBreakdown = $factures->groupBy('mode_paiement')->map->count();
 
         return view('billing.index', compact(
@@ -110,6 +110,16 @@ class FacturesController extends Controller
         flash()->success('Facture émise avec succès.');
 
         return redirect()->route('billing.index');
+    }
+
+    /**
+     * Display the invoice as a printable A4 document (paper or "Save as PDF").
+     */
+    public function show(string $id)
+    {
+        $facture = Facture::with(['patient', 'staff', 'consultation', 'lignes'])->findOrFail($id);
+
+        return view('billing.show', compact('facture'));
     }
 
     /**

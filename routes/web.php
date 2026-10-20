@@ -89,6 +89,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/billing', [FacturesController::class, 'index'])->name('billing.index');
         Route::get('/billing/create', [FacturesController::class, 'create'])->name('billing.create');
         Route::post('/billing/store', [FacturesController::class, 'store'])->name('billing.store');
+        Route::get('/billing/{id}', [FacturesController::class, 'show'])->name('billing.show');
         Route::get('/billing/{id}/edit', [FacturesController::class, 'edit'])->name('billing.edit');
         Route::put('/billing/{id}/update', [FacturesController::class, 'update'])->name('billing.update');
         Route::put('/billing/{id}/mark-paid', [FacturesController::class, 'markPaid'])->name('billing.markPaid');
