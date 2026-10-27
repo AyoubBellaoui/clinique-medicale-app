@@ -1,9 +1,9 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "ayoubbellaoui/clinicpro",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "description": "ClinicPro: clinic management system (patients, appointments, waiting queue, consultations, prescriptions, billing) built with Laravel.",
+    "keywords": ["laravel", "clinic", "healthcare", "medical", "management-system"],
     "license": "MIT",
     "require": {
         "php": "^8.3",
