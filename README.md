@@ -247,6 +247,3 @@ Released under the [MIT License](LICENSE).
 **Ayoub Bellaoui**
 
 [![GitHub](https://img.shields.io/badge/GitHub-AyoubBellaoui-181717?logo=github)](https://github.com/AyoubBellaoui)
-<!-- Add your LinkedIn and portfolio links here, e.g.:
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Ayoub_Bellaoui-0A66C2?logo=linkedin)](https://www.linkedin.com/in/your-profile)
--->
