@@ -2608,14 +2608,18 @@
             const now = new Date();
             const timeEl = document.getElementById('clock-time');
             const dateEl = document.getElementById('clock-date');
+            const tz = 'Etc/GMT-1';
+
             if (timeEl) timeEl.textContent = now.toLocaleTimeString('fr-FR', {
                 hour: '2-digit',
-                minute: '2-digit'
+                minute: '2-digit',
+                timeZone: tz
             });
             if (dateEl) dateEl.textContent = now.toLocaleDateString('fr-FR', {
                 weekday: 'short',
                 day: '2-digit',
-                month: 'short'
+                month: 'short',
+                timeZone: tz
             });
         }
         setInterval(updateClock, 1000);
